@@ -1,0 +1,57 @@
+{% extends 'general_app/base.html' %}
+{% block title %}Login{% endblock %}
+{% block content %}
+    <div>
+        <form action="{% url 'login' %}" METHOD="post" style="margin:50px">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="user">Username</label>
+
+                <label for="exampleDataList" class="form-label">Datalist example</label>
+                <input class="form-control" list="username_login" id="exampleDataList" placeholder="Username">
+                <datalist name="username_login" id="username_login">
+                     {% for user in user %}
+                            <option value="{{ user }}">{{ user }}</option>
+                        {% endfor %}
+                </datalist>
+
+
+                <div class="form-floating">
+                    <select class="form-select" name="username">
+                        {% for user in user %}
+                            <option value="{{ user }}">{{ user }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="floatingSelect">Name</label>
+                    {#                </div>#}
+                    {##}
+                    {#                <select name="username" class="form-select" aria-label="Default select example">#}
+                    {#                    {% for user in user %}#}
+                    {#                        <option value="{{ user }}">{{ user }}</option>#}
+                    {#                    {% endfor %}#}
+                    {#                </select>#}
+                    {#                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone#}
+                    {#                    else.</small>#}
+                    {#            </div>#}
+                    {#                    <div class="form-group">#}
+                    {#                        <label for="password">Password</label>#}
+                    {#                        <input type="password" class="form-control" id="password" placeholder="Password"#}
+                    {#                               name="password">#}
+                    {#                    </div>#}
+                    <div class="form-floating">
+                        <input type="password" class="form-control" id="floatingPassword" placeholder="Password"
+                               name="password">
+                        <label for="floatingPassword">Password</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    {% if request.GET.next %}
+                        <input type="hidden" name="next" value="{{ request.GET.next }}">
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+
+{% endblock %}
