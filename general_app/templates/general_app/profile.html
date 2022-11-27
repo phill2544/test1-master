@@ -3,7 +3,7 @@
 {% block content %}
 
 <form action="{% url 'profile' %} " method="post">
-{{ form_employee.non_field_errors }}
+{{ form_user.non_field_errors }}
 {{ form_auth.non_field_errors }}
  {% csrf_token %}
     <div class="container">
@@ -15,25 +15,25 @@
         <div class="m-3">
             <label for="address" class="form-label">Address</label>
             {#            <textarea class="form-control" id="address" rows="3" id="address" placeholder="185/19  ขอนแก่น"></textarea>#}
-            {{ form_employee.address.errors }}
-            {{ form_employee.address }}
+            {{ form_user.address.errors }}
+            {{ form_user.address }}
         </div>
         <div class="m-3">
             <label for="province" class="form-label">Province</label>
-            {{ form_employee.province.errors }}
-            {{ form_employee.province }}
+            {{ form_user.province.errors }}
+            {{ form_user.province }}
         </div>
         <div class="m-3">
             <label for="ministry" class="form-label">Ministry</label>
             {#            <input type="email" class="form-control" id="ministry" placeholder="กระทรวงสาธารณสุข">#}
-            {{ form_employee.ministry.errors }}
-            {{ form_employee.ministry }}
+            {{ form_user.ministry.errors }}
+            {{ form_user.ministry }}
         </div>
         <div class="m-3">
             <label for="code" class="form-label">Code</label>
             {#            <input type="email" class="form-control" id="code" placeholder="1234567">#}
-            {{ form_employee.code.errors }}
-            {{ form_employee.code }}
+            {{ form_user.code.errors }}
+            {{ form_user.code }}
         </div>
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>

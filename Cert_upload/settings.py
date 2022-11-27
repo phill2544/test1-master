@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'general_app.apps.GeneralAppConfig',
     "django_apscheduler",
+    'django_bootstrap_icons'
 ]
 
 MIDDLEWARE = [
@@ -126,7 +127,6 @@ STATIC_URL = 'static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-
 # EMAIL_HOST = 'smtp.mailtrap.io'
 # EMAIL_HOST_USER = 'cd7537bb0b0bbf'
 # EMAIL_HOST_PASSWORD = '7b0ebcade58093'
@@ -140,7 +140,6 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'sayomphu.su@gmail.com'
 EMAIL_HOST_PASSWORD = 'uqjphmceajewtffi'
 EMAIL_USE_TLS = True
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

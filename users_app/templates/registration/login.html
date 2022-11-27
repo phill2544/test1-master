@@ -3,51 +3,81 @@
 {% block content %}
     <div>
         <form action="{% url 'login' %}" METHOD="post" style="margin:50px">
+            {% if messages %}
+                {% for message in messages %}
+                    <script>
+                        Swal.fire({
+                            title: 'รหัสผ่านผิด กรุณากรอกใหม่',
+                            text: 'กรุณากรอกผู้ใช้งานและรหัสผ่านให้ถูกต้อง',
+                            icon: 'error',
+                            confirmButtonText: 'Cool',
+                            timer: 1500
+
+                        })
+                    </script>
+                {% endfor %}
+            {% endif %}
             {% csrf_token %}
             <div class="form-group">
-                <label for="user">Username</label>
-
-                <label for="exampleDataList" class="form-label">Datalist example</label>
-                <input class="form-control" list="username_login" id="exampleDataList" placeholder="Username">
-                <datalist name="username_login" id="username_login">
-                     {% for user in user %}
-                            <option value="{{ user }}">{{ user }}</option>
-                        {% endfor %}
-                </datalist>
-
-
+                {#            <label for="username" class="form-label">Email address</label>#}
                 <div class="form-floating">
-                    <select class="form-select" name="username">
+
+                    <input    {% if messages %}
+                        {% for message in messages %}
+                            class="form-control is-invalid"
+                        {% endfor %}
+                    {% else %}
+                            class="form-control "
+                    {% endif %} list="username_login" id="username"
+                            placeholder="Username" name="username" required>
+                    <datalist name="username_login" id="username_login">
                         {% for user in user %}
                             <option value="{{ user }}">{{ user }}</option>
                         {% endfor %}
-                    </select>
-                    <label for="floatingSelect">Name</label>
-                    {#                </div>#}
-                    {##}
-                    {#                <select name="username" class="form-select" aria-label="Default select example">#}
-                    {#                    {% for user in user %}#}
-                    {#                        <option value="{{ user }}">{{ user }}</option>#}
-                    {#                    {% endfor %}#}
-                    {#                </select>#}
-                    {#                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone#}
-                    {#                    else.</small>#}
-                    {#            </div>#}
-                    {#                    <div class="form-group">#}
-                    {#                        <label for="password">Password</label>#}
-                    {#                        <input type="password" class="form-control" id="password" placeholder="Password"#}
-                    {#                               name="password">#}
-                    {#                    </div>#}
-                    <div class="form-floating">
-                        <input type="password" class="form-control" id="floatingPassword" placeholder="Password"
-                               name="password">
-                        <label for="floatingPassword">Password</label>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                    {% if request.GET.next %}
-                        <input type="hidden" name="next" value="{{ request.GET.next }}">
-                    {% endif %}
+                    </datalist>
+                    <label for="floatingPassword">Username</label>
                 </div>
+
+                {#                <div class="form-floating">#}
+                {#                    <select class="form-select" name="username">#}
+                {#                        {% for user in user %}#}
+                {#                            <option value="{{ user }}">{{ user }}</option>#}
+                {#                        {% endfor %}#}
+                {#                    </select>#}
+                {#                    <label for="floatingSelect">Name</label>#}
+                {#                </div>#}
+                {##}
+                {#                <select name="username" class="form-select" aria-label="Default select example">#}
+                {#                    {% for user in user %}#}
+                {#                        <option value="{{ user }}">{{ user }}</option>#}
+                {#                    {% endfor %}#}
+                {#                </select>#}
+                {#                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone#}
+                {#                    else.</small>#}
+                {#            </div>#}
+                {#                    <div class="form-group">#}
+                {#                        <label for="password">Password</label>#}
+                {#                        <input type="password" class="form-control" id="password" placeholder="Password"#}
+                {#                               name="password">#}
+                {#                    </div>#}
+                {#                <label for="floatingPassword" class="form-label">Password</label>#}
+                <div class="form-floating">
+                    <input type="password" {% if messages %}
+                        {% for message in messages %}
+                           class="form-control is-invalid"
+                        {% endfor %}
+                    {% else %}
+                           class="form-control "
+                    {% endif %} id="floatingPassword"
+                           placeholder="Password"
+                           name="password" required>
+                    <label for="floatingPassword">Password</label>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+                {% if request.GET.next %}
+                    <input type="hidden" name="next" value="{{ request.GET.next }}">
+                {% endif %}
+
             </div>
         </form>
     </div>

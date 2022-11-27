@@ -3,14 +3,16 @@ from datetime import date
 
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.decorators import login_required
+from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
-from .models import Employee, CertificateFile
+from .models import User_Detail, CertificateFile
 from django.contrib.auth.models import User
-from .forms import EmployeeForm, UserProfileForm
+from .forms import User_DetailForm, UserProfileForm
 from django.conf import settings
 from . import updater
+import os
 
 from django.utils import timezone
 from django.core.mail import send_mail
@@ -44,38 +46,36 @@ def month(month):
 
 
 def delete_file():
-    # print(date.today().replace(month=1,day=1))
+    print("delete file")
     certificates = CertificateFile.objects.filter(
-        create_date__lte=date.today().replace(month=1, day=1) + relativedelta(years=-3))  # __lte = less than or equal
+        create_date__lte=date.today() + relativedelta(years=-3))  # __lte = less than or equal
     for certificate in certificates:
+        os.remove(certificate.cert.path)
         certificate.delete()
     pass
 
 
 def send_email():
-    print('send_Email',settings.EMAIL_HOST_USER)
-    users = Employee.objects.filter(send_email=False)
+    print('send_Email', settings.EMAIL_HOST_USER)
+    users = User_Detail.objects.filter(send_email=False)
     # for user in users:
     #     # print(type(user.cal_date.month))
     #     user.cal_date = date.today()
     #     user.save()
     #     print(user.email)
     if not users:  # No users send email = False
-        users = Employee.objects.all()
+        users = User_Detail.objects.all()
         for user in users:
             user.send_email = False
             user.save()
-
     for user in users:
         if (user.cal_date + relativedelta(months=-2)) < date.today():
-            username = user.username
-            months = month(user.cal_date.month)
             user.cal_date = (user.cal_date + relativedelta(years=1))
             user.send_email = True
             user.save()
             send_mail(
                 "แจ้งนัดล่วงหน้าเพื่อทำการตรวจสอบเครื่องมือแพทย์",
-                f'{username}ขอเข้าทำการนัดล่วงหน้าเพื่อเข้าไปตรวจสอบเครื่องมือแพทย์ในภายในเดือน{months}',
+                f'{user.username}ขอเข้าทำการนัดล่วงหน้าเพื่อเข้าไปตรวจสอบเครื่องมือแพทย์ในภายในเดือน{month(user.cal_date.month)}',
                 settings.EMAIL_HOST_USER,
                 [user.email],
                 fail_silently=False,
@@ -91,14 +91,6 @@ def home(request):
 
 @login_required
 def certificate(request):
-    # send_mail(
-    #     'Test again',
-    #     'Here is the message.',
-    #     'sayomphu.su@rmuti.ac.th',
-    #     ['phill2544@gmail.com'],
-    #     fail_silently=False,
-    # )
-    # print('mail')
     cert = None
     email_authen = None
     user = User.objects.get(id=request.user.id)
@@ -120,31 +112,31 @@ def certificate(request):
 def profile(request):
     if request.method == "POST":
         form_auth = UserProfileForm(request.POST, instance=request.user)  # instance is update that user request
-        form_employee = EmployeeForm(request.POST)
+        form_user = User_DetailForm(request.POST)
         # print(form_auth)
-        if form_auth.is_valid() and form_employee.is_valid():
+        if form_auth.is_valid() and form_user.is_valid():
             form_auth.save()
             try:
-                if Employee.objects.get(user_id=request.user.id).user_id:
+                if User_Detail.objects.get(user_id=request.user.id).user_id:
                     # update
-                    a = Employee.objects.filter(pk=request.user.employee.id).update(
-                        province=form_employee.cleaned_data['province'],
-                        address=form_employee.cleaned_data['address'],
-                        ministry=form_employee.cleaned_data['ministry'],
-                        code=form_employee.cleaned_data['code'])
+                    a = User_Detail.objects.filter(pk=request.user.user_detail.id).update(
+                        province=form_user.cleaned_data['province'],
+                        address=form_user.cleaned_data['address'],
+                        ministry=form_user.cleaned_data['ministry'],
+                        code=form_user.cleaned_data['code'])
             except:
-                profile = form_employee.save(commit=False)
+                profile = form_user.save(commit=False)
                 profile.user = request.user
                 profile.save()
         return HttpResponseRedirect(reverse(('profile')))
     else:
         form_auth = UserProfileForm(instance=request.user)
         try:
-            form_employee = EmployeeForm(instance=Employee.objects.get(pk=request.user.employee.id))  # instance
+            form_user = User_DetailForm(instance=User_Detail.objects.get(pk=request.user.user_detail.id))  # instance
         except:
-            form_employee = EmployeeForm()
+            form_user = User_DetailForm()
     context = {
-        'form_employee': form_employee,
+        'form_user': form_user,
         'form_auth': form_auth
     }
 

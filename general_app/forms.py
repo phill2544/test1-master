@@ -1,12 +1,12 @@
 from django import forms
-from .models import Employee
+from .models import User_Detail
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
 
-class EmployeeForm(forms.ModelForm):
+class User_DetailForm(forms.ModelForm):
     class Meta:
-        model = Employee
+        model = User_Detail
         fields = ('address', 'province', 'ministry', 'code')
         widgets = {
             'address': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'ที่อยู่', 'rows': '3'}),

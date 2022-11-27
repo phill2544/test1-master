@@ -2,21 +2,37 @@
 {% block title %}Certificate{% endblock %}
 {% block content %}
     {% for cert in cert %}
-
-        <div class="card" style="width: 18rem;">
-            <figure>
-                <img class="card-img-top" src="">
-                <figcaption>Hello</figcaption>
-            </figure>
-            <div class="card-body">
-                <a class="card-title" href="{{ cert.cert.url }}" target="_blank"
-                   rel="noopener noreferrer">{{ user.username }}</a>
-            </div>
-        </div>
-
-        <!--<div style="text-align: center;">-->
-        <!--    <a href="{{ cert.cert.url }}">Download PDF</a>-->
-        <!--</div>-->
+    <a href="{{ cert.cert.url }}">{{ cert.cert }}</a>
+        <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">No</th>
+      <th scope="col">File</th>
+      <th scope="col">Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>Mark</td>
+      <td>Otto</td>
+    </tr>
+  </tbody>
+</table>
+{#        <div class="card" style="width: 18rem;">#}
+{#            <figure>#}
+{#                <img class="card-img-top" src="">#}
+{#                <figcaption>Hello</figcaption>#}
+{#            </figure>#}
+{#            <div class="card-body">#}
+{#                <a class="card-title" href="{{ cert.cert.url }}" target="_blank"#}
+{#                   rel="noopener noreferrer">{{ user.username }}</a>#}
+{#            </div>#}
+{#        </div>#}
+{##}
+{#        <!--<div style="text-align: center;">-->#}
+{#        <!--    <a href="{{ cert.cert.url }}">Download PDF</a>-->#}
+{#        <!--</div>-->#}
     {% endfor %}
 
 
