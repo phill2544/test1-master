@@ -8,7 +8,8 @@
                     <script>
                         Swal.fire({
                             title: 'รหัสผ่านผิด กรุณากรอกใหม่',
-                            text: 'กรุณากรอกผู้ใช้งานและรหัสผ่านให้ถูกต้อง',
+                            {#text: 'กรุณากรอกผู้ใช้งานและรหัสผ่านให้ถูกต้อง ',#}
+                            text: '',
                             icon: 'error',
                             confirmButtonText: 'Cool',
                             timer: 1500
@@ -29,13 +30,13 @@
                     {% else %}
                             class="form-control "
                     {% endif %} list="username_login" id="username"
-                            placeholder="Username" name="username" required>
+                            placeholder="Username" name="username" required value="{{ request.POST.username }}" autocomplete="off">
                     <datalist name="username_login" id="username_login">
                         {% for user in user %}
-                            <option value="{{ user }}">{{ user }}</option>
+                            <option value="{{ user }}" >{{ user }}</option>
                         {% endfor %}
                     </datalist>
-                    <label for="floatingPassword">Username</label>
+                    <label for=" floatingPassword">Username</label>
                 </div>
 
                 {#                <div class="form-floating">#}

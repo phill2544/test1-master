@@ -1,47 +1,118 @@
 {% extends 'general_app/base.html' %}
 {% block title %}Certificate{% endblock %}
 {% block content %}
-    {% for cert in cert %}
-    <a href="{{ cert.cert.url }}">{{ cert.cert }}</a>
-        <table class="table">
-  <thead>
-    <tr>
-      <th scope="col">No</th>
-      <th scope="col">File</th>
-      <th scope="col">Date</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-    </tr>
-  </tbody>
-</table>
-{#        <div class="card" style="width: 18rem;">#}
-{#            <figure>#}
-{#                <img class="card-img-top" src="">#}
-{#                <figcaption>Hello</figcaption>#}
-{#            </figure>#}
-{#            <div class="card-body">#}
-{#                <a class="card-title" href="{{ cert.cert.url }}" target="_blank"#}
-{#                   rel="noopener noreferrer">{{ user.username }}</a>#}
-{#            </div>#}
-{#        </div>#}
-{##}
-{#        <!--<div style="text-align: center;">-->#}
-{#        <!--    <a href="{{ cert.cert.url }}">Download PDF</a>-->#}
-{#        <!--</div>-->#}
-    {% endfor %}
+    {% if user != None and email_authen == None %}
+        <script>
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2500,
+                timerProgressBar: false,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire({
+                icon: 'success',
+                title: '<strong>{{ user }}</strong> signed in successfully'
+            })
+        </script>
+    {% endif %}
+
+     {% if email_authen == email_valid %}
+        <script>
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: false,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire({
+                icon: 'success',
+                title: '<strong>{{ email_authen }}</strong> successfully'
+            })
+        </script>
+    {% endif %}
+    {% if email_authen != email_valid %}
+        <script>
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: false,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire({
+                icon: 'success',
+                title: 'กรุณาตรวจสอบอีกเมล์อีกครั้งเพื่อความถูกต้อง'
+            })
+        </script>
+    {% endif %}
+
+
+    <div class="row justify-content-md-center">
+        <div class="col">
+            <table class="table table-sm table-hover ">
+                <thead>
+                <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">File</th>
+                    <th scope="col">Date</th>
+                </tr>
+                </thead>
+                <tbody>
+                <div class="container">
+                    {% for cert in cert %}
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th>
+                            <td><a href="{{ cert.cert.url }}">{{ cert.cert }}</a></td>
+                            <td>{{ cert.create_date }}</td>
+                        </tr>
+                    {% endfor %}
+                </div>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {#        <div class="card" style="width: 18rem;">#}
+    {#            <figure>#}
+    {#                <img class="card-img-top" src="">#}
+    {#                <figcaption>Hello</figcaption>#}
+    {#            </figure>#}
+    {#            <div class="card-body">#}
+    {#                <a class="card-title" href="{{ cert.cert.url }}" target="_blank"#}
+    {#                   rel="noopener noreferrer">{{ user.username }}</a>#}
+    {#            </div>#}
+    {#        </div>#}
+    {##}
+    {#        <!--<div style="text-align: center;">-->#}
+    {#        <!--    <a href="{{ cert.cert.url }}">Download PDF</a>-->#}
+    {#        <!--</div>-->#}
 
 
 
 
-    {% if user.email == '' and email_authen is None %}
-        <form action="{% url 'certificate' %}" METHOD="post">
+
+    {% if user.email == '' and email_authen is None or email_authen != email_valid %}
+        <form action="{% url 'certificate' %}" METHOD="post" name="test">
             {% csrf_token %}
-            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" data-bs-backdrop="static" data-bs-keyboard="false"
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                 data-bs-backdrop="static" data-bs-keyboard="false"
                  data-keyboard="false" data-backdrop="static" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
@@ -55,12 +126,15 @@
                         <div class="modal-body">
                             <input type="email" class="form-control" id="exampleInputEmail1"
                                    aria-describedby="emailHelp"
-                                   placeholder="Enter email" name="email_cert" required>
+                                   placeholder="Enter email" name="email" required>
+                            <input type="email" name="email_valid" placeholder="Enter email again" class="form-control" autocomplete="off">
                             <small id="emailHelp" class="form-text text-muted">กรุณาใส่อีเมล์ที่สามารถใช้ได้จริงเพื่อทำการแจ้งเตือนนัดล่วงหน้า.</small>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-danger me-auto" data-bs-dismiss="modal" onclick="location.href='{% url 'logout' %}';">Logout</button>
-                            <button type="submit" class="btn btn-primary">Save changes</button>
+                            <button type="button" class="btn btn-danger me-auto" data-bs-dismiss="modal"
+                                    onclick="location.href='{% url 'logout' %}';">Logout
+                            </button>
+                            <button type="submit" class="btn btn-primary" name="btn_email">Save changes</button>
                         </div>
                     </div>
                 </div>

@@ -6,7 +6,6 @@ from django.contrib.auth.models import User
 
 # Create your views here.
 from django.urls import reverse
-import sweetify
 
 def login_user(request):
     if not request.user.is_authenticated: # not login yet
@@ -17,8 +16,7 @@ def login_user(request):
             print(user)
             if user is not None:
                 login(request, user)
-                sweetify.sweetalert(request, 'Westworld is awesome',text='Really... if you have the chance - watch it!', persistent='I agree!')
-                return redirect('certificate',)
+                return redirect('certificate')
             else:
                 messages.success(request,('Got something wrong'))
                 redirect('login')

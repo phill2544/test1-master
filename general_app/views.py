@@ -2,6 +2,7 @@ import datetime
 from datetime import date
 
 from dateutil.relativedelta import relativedelta
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render
@@ -93,18 +94,23 @@ def home(request):
 def certificate(request):
     cert = None
     email_authen = None
+    email_valid = None
     user = User.objects.get(id=request.user.id)
     if request.method == 'POST':
-        email_authen = request.POST['email_cert']
-        email = request.POST['email_cert']
-        user.email = email
-        user.save()
+        email_authen = request.POST['email']
+        email_valid = request.POST['email_valid']
+        print(email_authen, email_valid)
+        if email_authen == email_valid:
+            user.email = email_authen
+            user.save()
+        else:
+            return render(request, 'general_app/Certificate.html',context={'email_authen': email_authen, 'email_valid': email_valid})
     if request.user.is_authenticated:
         try:
             cert = CertificateFile.objects.filter(hospital_id=request.user.id)
         except:
             pass
-    context = {'cert': cert, 'email_authen': email_authen}
+    context = {'cert': cert, 'email_authen': email_authen, 'email_valid': email_valid}
     return render(request, 'general_app/Certificate.html', context)
 
 
