@@ -1,5 +1,5 @@
 from django import forms
-from .models import User_Detail
+from .models import User_Detail, CertificateFile
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
@@ -28,3 +28,5 @@ class UserProfileForm(forms.ModelForm):
         widgets = {
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'hospital@mail.com'})
         }
+
+

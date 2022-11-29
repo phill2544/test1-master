@@ -31,3 +31,7 @@ class CertificateFile(models.Model):
     def __str__(self):
         return str(self.hospital)
 
+    @property
+    def username(self):
+        return self.hospital.user.username
+

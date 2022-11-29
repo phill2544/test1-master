@@ -1,7 +1,7 @@
 {% extends 'general_app/base.html' %}
 {% block title %}Certificate{% endblock %}
 {% block content %}
-    {% if user != None and email_authen == None %}
+    {% if user != None and email_authen == None and request.META.HTTP_CACHE_CONTROL %}
         <script>
             const Toast = Swal.mixin({
                 toast: true,
@@ -22,7 +22,7 @@
         </script>
     {% endif %}
 
-     {% if email_authen == email_valid %}
+    {% if email_authen == email_valid and request.method == 'POST' %}
         <script>
             const Toast = Swal.mixin({
                 toast: true,
@@ -42,6 +42,7 @@
             })
         </script>
     {% endif %}
+
     {% if email_authen != email_valid %}
         <script>
             const Toast = Swal.mixin({
@@ -64,50 +65,38 @@
     {% endif %}
 
 
-    <div class="row justify-content-md-center">
-        <div class="col">
-            <table class="table table-sm table-hover ">
-                <thead>
-                <tr>
-                    <th scope="col">No</th>
-                    <th scope="col">File</th>
-                    <th scope="col">Date</th>
-                </tr>
-                </thead>
-                <tbody>
-                <div class="container">
-                    {% for cert in cert %}
-                        <tr>
-                            <th scope="row">{{ forloop.counter }}</th>
-                            <td><a href="{{ cert.cert.url }}">{{ cert.cert }}</a></td>
-                            <td>{{ cert.create_date }}</td>
-                        </tr>
-                    {% endfor %}
-                </div>
-                </tbody>
-            </table>
+    <div class="d-flex justify-content-center flex-wrap">
+        <div class="">
+            <div class="p-2 flex-grow-2 bd-highlight">
+                <table class="table table-lg table-hover ">
+                    <thead>
+                    <tr>
+                        <th scope="col">No</th>
+                        <th scope="col">File</th>
+                        <th scope="col">Date</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <div class="container">
+                        {% for cert in cert %}
+                            <tr>
+                                <th scope="row">{{ forloop.counter }}</th>
+                                <td><a href="{{ cert.cert.url }}" target="_blank">{{ cert.cert }}</a></td>
+                                <td>{{ cert.create_date }}</td>
+                            </tr>
+                        {% endfor %}
+                    </div>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    {#        <div class="card" style="width: 18rem;">#}
-    {#            <figure>#}
-    {#                <img class="card-img-top" src="">#}
-    {#                <figcaption>Hello</figcaption>#}
-    {#            </figure>#}
-    {#            <div class="card-body">#}
-    {#                <a class="card-title" href="{{ cert.cert.url }}" target="_blank"#}
-    {#                   rel="noopener noreferrer">{{ user.username }}</a>#}
-    {#            </div>#}
-    {#        </div>#}
-    {##}
-    {#        <!--<div style="text-align: center;">-->#}
-    {#        <!--    <a href="{{ cert.cert.url }}">Download PDF</a>-->#}
-    {#        <!--</div>-->#}
 
 
 
 
-
+    {#email_authen#}
     {% if user.email == '' and email_authen is None or email_authen != email_valid %}
         <form action="{% url 'certificate' %}" METHOD="post" name="test">
             {% csrf_token %}
@@ -127,7 +116,8 @@
                             <input type="email" class="form-control" id="exampleInputEmail1"
                                    aria-describedby="emailHelp"
                                    placeholder="Enter email" name="email" required>
-                            <input type="email" name="email_valid" placeholder="Enter email again" class="form-control" autocomplete="off">
+                            <input type="email" name="email_valid" placeholder="Enter email again" class="form-control"
+                                   autocomplete="off">
                             <small id="emailHelp" class="form-text text-muted">กรุณาใส่อีเมล์ที่สามารถใช้ได้จริงเพื่อทำการแจ้งเตือนนัดล่วงหน้า.</small>
                         </div>
                         <div class="modal-footer">
@@ -140,7 +130,6 @@
                 </div>
             </div>
         </form>
-
 
     {% endif %}
 {% endblock %}

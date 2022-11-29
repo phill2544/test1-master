@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     {% load static %}
-{% load bootstrap_icons %}
+    {% load bootstrap_icons %}
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
@@ -20,7 +20,6 @@
 <body>
 <header>
 
-
     <nav class="navbar navbar-expand-sm navbar-dark bg-success">
         <div class="container-fluid ">
             <a class="navbar-brand" href="{% url 'certificate' %}" style="margin-left:10px">
@@ -34,21 +33,28 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
-                        <a class="nav-link " href="{% url 'certificate' %}">
-                            {% bs_icon 'folder2-open' size='23'%}
-                            Home</a>
+                        <a class="nav-link " href="{% url 'certificate' %}" id="btn_home">
+                            {% bs_icon 'folder2-open' size='23' %} Home</a>
                     </li>
+                    {% if request.user.is_superuser %}
+                        <li class="nav-item active">
+                            <a class="nav-link" href="{% url 'upload_cert' %}">{% bs_icon 'upload' size='23' %}Upload<span class="sr-only"></span></a>
+                        </li>
+                        <li class="nav-item active">
+                            <a class="nav-link" href="{% url 'configuration' %}">{% bs_icon 'gear' size='23' %}Configuration<span class="sr-only"></span></a>
+                        </li>
+                    {% endif %}
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
                         <li class="nav-item active">
                             <a class="nav-link" href=" {% url 'profile' %}">
-                                {% bs_icon 'person-circle' size='23'%}
+                                {% bs_icon 'person-circle' size='23' %}
                                 </i>{{ user.username }}<span
                                     class="sr-only"></span></a>
                         </li>
                         <li class="nav-item active">
-                            <a class="nav-link" href="{% url 'logout' %}">Logout<span class="sr-only"></span></a>
+                            <a class="nav-link" href="{% url 'logout' %}">{% bs_icon 'door-open' size='23' %}Logout<span class="sr-only"></span></a>
                         </li>
                     {% endif %}
                 </ul>

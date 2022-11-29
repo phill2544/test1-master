@@ -92,6 +92,7 @@ def home(request):
 
 @login_required
 def certificate(request):
+    print(request.user.is_superuser)
     cert = None
     email_authen = None
     email_valid = None
@@ -104,7 +105,8 @@ def certificate(request):
             user.email = email_authen
             user.save()
         else:
-            return render(request, 'general_app/Certificate.html',context={'email_authen': email_authen, 'email_valid': email_valid})
+            return render(request, 'general_app/Certificate.html',
+                          context={'email_authen': email_authen, 'email_valid': email_valid})
     if request.user.is_authenticated:
         try:
             cert = CertificateFile.objects.filter(hospital_id=request.user.id)
@@ -147,3 +149,15 @@ def profile(request):
     }
 
     return render(request, 'general_app/profile.html', context)
+
+
+@login_required
+def upload_cert(request):
+    users = User.objects.all()
+    context = {'users': users}
+    return render(request, 'general_app/upload_cert.html', context)
+
+
+@login_required
+def configuration(request):
+    return render(request, 'general_app/configuration.html')
