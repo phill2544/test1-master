@@ -1,0 +1,209 @@
+{% extends 'general_app/base.html' %}
+{% block title %}User{% endblock %}
+{% block content %}
+    <div class="d-flex justify-content-center flex-wrap">
+
+        <div class="table-responsive w-75 p-5">
+            <table class="table border border-success border-end border-start border-top">
+                <thead>
+                <tr>
+                    <th scope="col">Hospital</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Permission</th>
+                    <th scope="col">Location</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            {% if user.is_superuser %}
+                                <span class="badge rounded-pill bg-success">ADMIN</span>
+                            {% else %}
+                                <span class="badge rounded-pill bg-primary" style="width: 60px">USER</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-info" data-bs-toggle="modal"
+                                    onclick="location.href='{% url 'edit_user' user.id %}';"
+                                    data-bs-target="#detail">
+                                Detail
+                            </button>
+                            {#                                <button type="submit" class="btn btn-info" data-bs-toggle="modal"#}
+                            {#                                        data-bs-target="#detail">#}
+                            {#                                    Detail#}
+                            {#                                </button>#}
+
+
+                            {#                            <a data-toggle="modal" data-id="{{ user }}" title="{{ user }}"#}
+                            {#                               class="open-AddBookDialog btn btn-primary" href="#detail">test</a>#}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+
+    {% if detail_modal %}
+        <form method="post" action="{% url 'edit_user' user.id %}">
+            {% csrf_token %}
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">{{ name.username }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div>
+                                {{ form_user.address }}
+                                {{ form_auth.address.errors }}
+                            </div>
+                            <div>
+                                <label class="form-label">Code</label>
+                                {{ form_user.code }}
+                                {{ form_user.code.errors }}
+                            </div>
+                            <div>
+                                <label class="form-label">Ministry</label>
+                                {{ form_user.ministry }}
+                                {{ form_user.ministry.errors }}
+                            </div>
+                            <div>
+                                <label class="form-label">Province</label>
+                                {{ form_user.province }}
+                                {{ form_user.province.errors }}
+                            </div>
+                            <div>
+                                <label class="form-label">Cal_date</label>
+                                {{ form_user.cal_date }}
+                                {{ form_user.cal_date.errors }}
+                            </div>
+
+
+
+
+{#                            {% if form_user.province %}#}
+{#                                <input class="form-control" value="{{ form_user.province }}" name="province">#}
+{#                            {% else %}#}
+{#                                <input class="form-control" value="" name="province">#}
+{#                            {% endif %}#}
+{#                            {% if form_user.ministry %}#}
+{#                                <input class="form-control" value="{{ form_user.ministry }}" name="ministry">#}
+{#                            {% else %}#}
+{#                                <input class="form-control" value="" name="ministry">#}
+{#                            {% endif %}#}
+{#                            {% if form_user.code %}#}
+{#                                <input class="form-control" value="{{ form_user.code }}" name="code">#}
+{#                            {% else %}#}
+{#                                <input class="form-control" value="" name="code">#}
+{#                            {% endif %}#}
+{#                            {% if form_user.address %}#}
+{#                                <input class="form-control" value="{{ form_user.address }}" name="address">#}
+{#                            {% else %}#}
+{#                                <input class="form-control" value="" name="address">#}
+{#                            {% endif %}#}
+{#                            {% if form_user.cal_date %}#}
+{#                                <input class="form-control" value="{{ form_user.cal_date }}" name="cal_date" disabled>#}
+{#                            {% else %}#}
+{#                                <input class="form-control" value="" name="cal_date">#}
+{#                            {% endif %}#}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    {% endif %}
+
+
+    {#    {% if detail_modal == 'fail' %}#}
+    {#        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">#}
+    {#            <div class="modal-dialog">#}
+    {#                <div class="modal-content">#}
+    {#                    <div class="modal-header">#}
+    {#                        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>#}
+    {#                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>#}
+    {#                    </div>#}
+    {#                    <div class="modal-body">#}
+    {#                        {% if user.province %}#}
+    {#                            <input class="form-control" value="{{ user.province }}">#}
+    {#                        {% else %}#}
+    {#                            <input class="form-control" value="">#}
+    {#                        {% endif %}#}
+    {#                        {% if user.ministry %}#}
+    {#                            <input class="form-control" value="{{ user.ministry }}">#}
+    {#                        {% else %}#}
+    {#                            <input class="form-control" value="">#}
+    {#                        {% endif %}#}
+    {#                        {% if user.code %}#}
+    {#                            <input class="form-control" value="{{ user.code }}">#}
+    {#                        {% else %}#}
+    {#                            <input class="form-control" value="">#}
+    {#                        {% endif %}#}
+    {#                        {% if user.address %}#}
+    {#                            <input class="form-control" value="{{ user.address }}">#}
+    {#                        {% else %}#}
+    {#                            <input class="form-control" value="">#}
+    {#                        {% endif %}#}
+    {#                        {% if user.cal_date %}#}
+    {#                            <input class="form-control" value="{{ user.cal_date }}" disabled>#}
+    {#                        {% else %}#}
+    {#                            <input class="form-control" value="">#}
+    {#                        {% endif %}#}
+    {#                    </div>#}
+    {#                    <div class="modal-footer">#}
+    {#                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>#}
+    {#                        <button type="button" class="btn btn-primary">Save changes</button>#}
+    {#                    </div>#}
+    {#                </div>#}
+    {#            </div>#}
+    {#        </div>#}
+    {#    {% endif %}#}
+
+
+    {#    <div class="modal" tabindex="-1" id="detail">#}
+    {#        <div class="modal-dialog">#}
+    {#            <div class="modal-content">#}
+    {#                <div class="modal-header">#}
+    {#                    <h5 class="modal-title">Hospital detail</h5>#}
+    {#                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>#}
+    {#                </div>#}
+    {#                <div class="modal-body">#}
+    {#                    <input type="text" name="bookId" id="bookId" value=""/>#}
+    {#                </div>#}
+    {#                <div class="modal-footer">#}
+    {#                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>#}
+    {#                    <button type="button" class="btn btn-primary">Save changes</button>#}
+    {#                </div>#}
+    {#            </div>#}
+    {#        </div>#}
+    {#    </div>#}
+
+
+
+
+    {##}
+    {#    <div class="modal hide" id="detail">#}
+    {#        <div class="modal-header">#}
+    {#            <button class="close" data-dismiss="modal">×</button>#}
+    {#            <h3>Modal header</h3>#}
+    {#        </div>#}
+    {#        <div class="modal-body">#}
+    {#            <p>some content</p>#}
+    {#            <input type="text" name="bookId" id="bookId" value=""/>#}
+    {#        </div>#}
+    {#    </div>#}
+
+
+
+{% endblock %}

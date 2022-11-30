@@ -1,12 +1,13 @@
 import datetime
 from datetime import date
-
+import sweetify
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render
 from django.http.response import HttpResponse, HttpResponseRedirect
+from django.template import RequestContext
 from django.urls import reverse
 from .models import User_Detail, CertificateFile
 from django.contrib.auth.models import User
@@ -98,21 +99,29 @@ def certificate(request):
     email_valid = None
     user = User.objects.get(id=request.user.id)
     if request.method == 'POST':
-        email_authen = request.POST['email']
-        email_valid = request.POST['email_valid']
-        print(email_authen, email_valid)
-        if email_authen == email_valid:
-            user.email = email_authen
-            user.save()
-        else:
-            return render(request, 'general_app/Certificate.html',
-                          context={'email_authen': email_authen, 'email_valid': email_valid})
+        try:
+            email_authen = request.POST['email']
+            email_valid = request.POST['email_valid']
+            if email_authen == email_valid:
+                user.email = email_authen
+                user.save()
+            else:
+                return render(request, 'general_app/Certificate.html',
+                              context={'email_authen': email_authen, 'email_valid': email_valid})
+        except:
+            cert = request.POST['cert_file']
+            hospital_id = User.objects.get(
+                username=request.POST['username']).id  # get is a object and filter is multi objects
+            certificate_file = CertificateFile.objects.create(cert=cert, hospital_id=hospital_id)
+            context = {'certificate_file': request.POST['cert_file']}
+            return render(request, 'general_app/Certificate.html', context)
     if request.user.is_authenticated:
         try:
+            users = User.objects.all()
             cert = CertificateFile.objects.filter(hospital_id=request.user.id)
         except:
             pass
-    context = {'cert': cert, 'email_authen': email_authen, 'email_valid': email_valid}
+    context = {'cert': cert, 'email_authen': email_authen, 'email_valid': email_valid, 'users': users}
     return render(request, 'general_app/Certificate.html', context)
 
 
@@ -152,12 +161,50 @@ def profile(request):
 
 
 @login_required
-def upload_cert(request):
-    users = User.objects.all()
-    context = {'users': users}
-    return render(request, 'general_app/upload_cert.html', context)
+def configuration(request):
+    return render(request, 'general_app/configuration.html')
 
 
 @login_required
-def configuration(request):
-    return render(request, 'general_app/configuration.html')
+def manage_user(request):
+    users = User.objects.all()
+    print(User_Detail.objects.get(user_id=request.user.id))
+    print(request.user)
+    if request.method == 'POST':
+        form_user = User_DetailForm(request.POST, instance=User_Detail.objects.get(user_id=request.user.id))
+        if form_user.is_valid():
+            form_user.save()
+            # form = form_user.save(commit=False)
+            # form.user = request.user
+            # form.save()
+    context = {'users': users}
+    return render(request, 'general_app/manage_users.html', context)
+
+@login_required
+def edit_user(request, pk):
+    users = User.objects.all()
+    name = User_Detail.objects.get(user_id=pk)
+    if request.method == 'POST':
+        form_user = User_DetailForm(request.POST, instance=User_Detail.objects.get(user_id=request.user.id))
+        if form_user.is_valid():
+            form_user.save()
+    # form = {
+    #     'province' : request.POST['province'],
+    #     'address' : request.POST['address'],
+    #     'code' : request.POST['code'],
+    #     'cal_date' : request.POST['cal_daet'],
+    #     'ministry' : request.POST['ministry'],
+    #
+    # }
+    # province = request.POST['province']
+    # address = request.POST['address']
+    # code = request.POST['code']
+    # cal_date = request.POST['cal_date']
+    # ministry = request.POST['ministry']
+    try:
+        form_user = User_DetailForm(instance=User_Detail.objects.get(user_id=pk))
+    except:
+        return render(request, 'general_app/manage_users.html',
+                      context={'detail_modal': True, 'users': users, 'form_user': None, 'name': name})
+    return render(request, 'general_app/manage_users.html',
+                  context={'detail_modal': True, 'users': users, 'form_user': form_user, 'name': name})

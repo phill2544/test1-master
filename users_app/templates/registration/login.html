@@ -3,6 +3,7 @@
 {% block content %}
     <div>
         <form action="{% url 'login' %}" METHOD="post" style="margin:50px">
+            {% csrf_token %}
             {% if messages %}
                 {% for message in messages %}
                     <script>
@@ -17,7 +18,6 @@
                     </script>
                 {% endfor %}
             {% endif %}
-            {% csrf_token %}
             <div class="form-group">
                 {#            <label for="username" class="form-label">Email address</label>#}
                 <div class="form-floating">
@@ -29,10 +29,11 @@
                     {% else %}
                             class="form-control "
                     {% endif %} list="username_login" id="username"
-                            placeholder="Username" name="username" required value="{{ request.POST.username }}" autocomplete="off">
+                            placeholder="Username" name="username" required value="{{ request.POST.username }}"
+                            autocomplete="off">
                     <datalist name="username_login" id="username_login">
                         {% for user in user %}
-                            <option value="{{ user }}" >{{ user }}</option>
+                            <option value="{{ user }}">{{ user }}</option>
                         {% endfor %}
                     </datalist>
                     <label for=" floatingPassword">Username</label>

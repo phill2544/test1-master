@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'general_app.apps.GeneralAppConfig',
     "django_apscheduler",
-    'django_bootstrap_icons'
+    'django_bootstrap_icons',
+    'sweetify'
 ]
 
 MIDDLEWARE = [
@@ -153,3 +154,5 @@ LOGIN_URL = 'login'
 
 SCHEDULER_DEFAULT = True
 APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+
+SWEETIFY_SWEETALERT_LIBRARY = 'sweetalert2'

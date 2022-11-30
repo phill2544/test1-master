@@ -1,7 +1,8 @@
 {% extends 'general_app/base.html' %}
 {% block title %}Certificate{% endblock %}
 {% block content %}
-    {% if user != None and email_authen == None and request.META.HTTP_CACHE_CONTROL %}
+    {% csrf_token %}
+    {% if login %}
         <script>
             const Toast = Swal.mixin({
                 toast: true,
@@ -63,6 +64,55 @@
             })
         </script>
     {% endif %}
+
+
+        {% if certificate_file %}
+        <script>
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: false,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire({
+                icon: 'success',
+                title: '<strong>{{ certificate_file.cert }}</strong> uploaded successfully'
+            })
+        </script>
+    {% endif %}
+
+
+
+{#upload#}
+    {% if request.user.is_superuser %}
+        <form action="{% url 'certificate' %}" method="post">
+            {% csrf_token %}
+            <div class="d-flex justify-content-center flex-wrap" style="margin-top: 50px">
+                <div class="p-2">
+                    <input class="form-control form-control-lg " type="file" required name="cert_file">
+                </div>
+                <div class="p-2">
+                    <input class="form-control form-control-lg " list="datalistOptions" id="exampleDataList"
+                           placeholder="Type to search..." required name="username">
+                    <datalist id="datalistOptions">
+                        {% for user in users %}
+                            <option value="{{ user }}">
+                        {% endfor %}
+                    </datalist>
+                </div>
+                <div class="btn-group btn-group-lg p-2" role="group" aria-label="...">
+                    <button type="submit" class="btn btn-outline-success " role="group"><strong>Submit</strong></button>
+                </div>
+            </div>
+        </form>
+    {% endif %}
+
 
 
     <div class="d-flex justify-content-center flex-wrap">

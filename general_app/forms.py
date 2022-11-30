@@ -5,14 +5,17 @@ from django.contrib.auth.models import User
 
 
 class User_DetailForm(forms.ModelForm):
+    cal_date = forms.DateField(required=True)
     class Meta:
         model = User_Detail
-        fields = ('address', 'province', 'ministry', 'code')
+        fields = ('address', 'province', 'ministry', 'code', 'cal_date')
         widgets = {
             'address': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'ที่อยู่', 'rows': '3'}),
             'province': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'ขอนแก่น'}),
             'ministry': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'กระทรวงสาธารณสุข'}),
             'code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '1234567'}),
+            'cal_date': forms.DateField(),
+
         }
     # user = models.OneToOneField(User, on_delete=models.CASCADE)
     # address = models.TextField(null=True,)
@@ -24,9 +27,8 @@ class User_DetailForm(forms.ModelForm):
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('email',)
+        fields = ('email','username')
         widgets = {
-            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'hospital@mail.com'})
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'hospital@mail.com'}),
+            'username': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Username'}),
         }
-
-

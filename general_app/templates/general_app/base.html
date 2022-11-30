@@ -38,11 +38,14 @@
                     </li>
                     {% if request.user.is_superuser %}
                         <li class="nav-item active">
-                            <a class="nav-link" href="{% url 'upload_cert' %}">{% bs_icon 'upload' size='23' %}Upload<span class="sr-only"></span></a>
+                            <a class="nav-link" href="{% url 'manage_user' %}">{% bs_icon 'person-gear' size='23' %}Manage
+                                user<span class="sr-only"></span></a>
                         </li>
                         <li class="nav-item active">
-                            <a class="nav-link" href="{% url 'configuration' %}">{% bs_icon 'gear' size='23' %}Configuration<span class="sr-only"></span></a>
+                            <a class="nav-link" href="{% url 'configuration' %}">{% bs_icon 'gear' size='23' %}Configuration<span
+                                    class="sr-only"></span></a>
                         </li>
+
                     {% endif %}
                 </ul>
                 <ul class="navbar-nav ms-auto">
@@ -54,7 +57,8 @@
                                     class="sr-only"></span></a>
                         </li>
                         <li class="nav-item active">
-                            <a class="nav-link" href="{% url 'logout' %}">{% bs_icon 'door-open' size='23' %}Logout<span class="sr-only"></span></a>
+                            <a class="nav-link" href="{% url 'logout' %}">{% bs_icon 'door-open' size='23' %}Logout<span
+                                    class="sr-only"></span></a>
                         </li>
                     {% endif %}
                 </ul>
@@ -86,6 +90,8 @@
 
 {% block content %}{% endblock %}
 
+{% load sweetify %}
+{% sweetify %}
 
 </body>
 </html>

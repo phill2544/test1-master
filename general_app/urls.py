@@ -7,7 +7,8 @@ urlpatterns = [
     path('users/', include('users_app.urls')),
     path('certificate/', views.certificate, name='certificate'),
     path('profile/', views.profile, name='profile'),
-    path('upload_certificate/', views.upload_cert, name='upload_cert'),
     path('configuration/', views.configuration, name='configuration'),
+    path('Manage_users/', views.manage_user, name='manage_user'),
+    path('Manage_users/<int:pk>', views.edit_user, name='edit_user')
 
 ]
