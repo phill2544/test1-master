@@ -16,10 +16,11 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/css/bootstrap-select.css"/>
     <link rel="stylesheet" href="{% static 'main.css' %}"/>
 
+
+
 </head>
 <body>
 <header>
-
     <nav class="navbar navbar-expand-sm navbar-dark bg-success">
         <div class="container-fluid ">
             <a class="navbar-brand" href="{% url 'certificate' %}" style="margin-left:10px">
@@ -34,15 +35,16 @@
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
                         <a class="nav-link " href="{% url 'certificate' %}" id="btn_home">
-                            {% bs_icon 'folder2-open' size='23' %} Home</a>
+                            {% bs_icon 'folder2-open' size='23' %} หน้าแรก</a>
                     </li>
                     {% if request.user.is_superuser %}
                         <li class="nav-item active">
-                            <a class="nav-link" href="{% url 'manage_user' %}">{% bs_icon 'person-gear' size='23' %}Manage
-                                user<span class="sr-only"></span></a>
+                            <a class="nav-link" href="{% url 'manage_user' %}">{% bs_icon 'person-gear' size='23' %}จัดการผู้ใช้งาน
+                                <span class="sr-only"></span></a>
                         </li>
                         <li class="nav-item active">
-                            <a class="nav-link" href="{% url 'configuration' %}">{% bs_icon 'gear' size='23' %}Configuration<span
+                            <a class="nav-link"
+                               href="{% url 'configuration' %}">{% bs_icon 'gear' size='23' %}ตั้งค่า<span
                                     class="sr-only"></span></a>
                         </li>
 
@@ -57,7 +59,7 @@
                                     class="sr-only"></span></a>
                         </li>
                         <li class="nav-item active">
-                            <a class="nav-link" href="{% url 'logout' %}">{% bs_icon 'door-open' size='23' %}Logout<span
+                            <a class="nav-link" href="{% url 'logout' %}">{% bs_icon 'door-open' size='23' %}ออกจากระบบ<span
                                     class="sr-only"></span></a>
                         </li>
                     {% endif %}
@@ -84,10 +86,8 @@
     $(document).ready(function () { //auto open model
         $('#exampleModal').modal('show');
     });
-
 </script>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 {% block content %}{% endblock %}
 
 {% load sweetify %}

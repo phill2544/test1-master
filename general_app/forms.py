@@ -5,16 +5,22 @@ from django.contrib.auth.models import User
 
 
 class User_DetailForm(forms.ModelForm):
-    cal_date = forms.DateField(required=True)
     class Meta:
         model = User_Detail
         fields = ('address', 'province', 'ministry', 'code', 'cal_date')
         widgets = {
             'address': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'ที่อยู่', 'rows': '3'}),
-            'province': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'ขอนแก่น'}),
+            'province': forms.Select(choices=(
+                ('ขอนแก่น', 'ขอนแก่น'),
+                ('มหาสารคาม', 'มหาสารคาม'),
+                ('ร้อยเอ็ด', 'ร้อยเอ็ด'),
+                ('กาฬสินธุ์', 'กาฬสินธุ์'),
+            ), attrs={'class': 'form-control', 'placeholder': 'ขอนแก่น'}),
             'ministry': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'กระทรวงสาธารณสุข'}),
             'code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '1234567'}),
-            'cal_date': forms.DateField(),
+            'cal_date': forms.DateInput(format=('%Y-%m-%d'),
+                                        attrs={'class': 'form-control', 'placeholder': 'Select Date', 'type': 'date',
+                                               'onfocus': 'this.showPicker()', }),
 
         }
     # user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -27,8 +33,26 @@ class User_DetailForm(forms.ModelForm):
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('email','username')
+        fields = ('email', 'username')
         widgets = {
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'hospital@mail.com'}),
-            'username': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Username'}),
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}),
+        }
+
+
+class UserCreationForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('email', 'username', 'password', 'is_superuser',)
+        widgets = {
+            'email': forms.EmailInput(
+                attrs={'class': 'form-control', 'placeholder': 'hospital@mail.com'}),
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}),
+            'password': forms.PasswordInput(
+                attrs={'class': 'form-control', 'placeholder': 'Password', 'id': 'password', 'name': 'password',
+                       'minlength': '8'}),
+            'is_superuser': forms.Select(choices=(
+                ('0', 'User'),
+                ('1', 'Admin'),
+            ), attrs={'class': 'form-control', 'placeholder': 'Permission'}),
         }

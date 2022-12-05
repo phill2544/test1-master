@@ -1,16 +1,29 @@
 {% extends 'general_app/base.html' %}
-{% block title %}User{% endblock %}
+{% block title %}Manage User{% endblock %}
 {% block content %}
+    {% if Is_passowrd or exist_user %}
+        <script>
+            $(document).ready(function () {
+                $('#add_user').modal('show');
+            })
+        </script>
+    {% endif %}
     <div class="d-flex justify-content-center flex-wrap">
 
         <div class="table-responsive w-75 p-5">
+            <div class="ml-2 mb-2">
+                <button type="submit" class="btn btn-primary" name="add_user" data-bs-toggle="modal"
+                        data-bs-target="#add_user">
+                    เพิ่มผู้ใช้งาน
+                </button>
+            </div>
             <table class="table border border-success border-end border-start border-top">
                 <thead>
                 <tr>
-                    <th scope="col">Hospital</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Permission</th>
-                    <th scope="col">Location</th>
+                    <th scope="col">ชื่อผู้ใช้งาน</th>
+                    <th scope="col">อีเมล</th>
+                    <th scope="col" style="text-align: center">บทบาท</th>
+                    <th scope="col" style="text-align: center">ที่อยู่</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -18,27 +31,19 @@
                     <tr>
                         <td>{{ user.username }}</td>
                         <td>{{ user.email }}</td>
-                        <td>
+                        <td style="text-align: center">
                             {% if user.is_superuser %}
-                                <span class="badge rounded-pill bg-success">ADMIN</span>
+                                <span class="badge rounded-pill bg-success" >ผู้ดูแลระบบ</span>
                             {% else %}
-                                <span class="badge rounded-pill bg-primary" style="width: 60px">USER</span>
+                                <span class="badge rounded-pill bg-primary" style="width: 75px">ผู้ใช้งาน</span>
                             {% endif %}
                         </td>
-                        <td>
+                        <td style="text-align: center">
                             <button type="button" class="btn btn-info" data-bs-toggle="modal"
                                     onclick="location.href='{% url 'edit_user' user.id %}';"
                                     data-bs-target="#detail">
                                 Detail
                             </button>
-                            {#                                <button type="submit" class="btn btn-info" data-bs-toggle="modal"#}
-                            {#                                        data-bs-target="#detail">#}
-                            {#                                    Detail#}
-                            {#                                </button>#}
-
-
-                            {#                            <a data-toggle="modal" data-id="{{ user }}" title="{{ user }}"#}
-                            {#                               class="open-AddBookDialog btn btn-primary" href="#detail">test</a>#}
                         </td>
                     </tr>
                 {% endfor %}
@@ -50,20 +55,32 @@
 
 
     {% if detail_modal %}
-        <form method="post" action="{% url 'edit_user' user.id %}">
+        <form method="post" action="{% url 'edit_user' name.user_id %}">
             {% csrf_token %}
             <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                 data-bs-backdrop="static" data-bs-keyboard="false"
                  aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">{{ name.username }}</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                                    onclick="location.href='{% url 'manage_user' %}';"></button>
                         </div>
                         <div class="modal-body">
                             <div>
+                                <label class="form-label">Address</label>
                                 {{ form_user.address }}
-                                {{ form_auth.address.errors }}
+                                {{ form_user.address.errors }}
+                            </div>
+                            <div>
+                                <label class="form-label">Email</label>
+                                {{ form_user_email.email }}
+                                {{ form_user_email.email.errors }}
+                            </div>
+                            <div id="divCheckbox" style="display: none;">
+                                {{ form_user_email.username }}
+                                {{ form_user_email.username.errors }}
                             </div>
                             <div>
                                 <label class="form-label">Code</label>
@@ -85,38 +102,11 @@
                                 {{ form_user.cal_date }}
                                 {{ form_user.cal_date.errors }}
                             </div>
-
-
-
-
-{#                            {% if form_user.province %}#}
-{#                                <input class="form-control" value="{{ form_user.province }}" name="province">#}
-{#                            {% else %}#}
-{#                                <input class="form-control" value="" name="province">#}
-{#                            {% endif %}#}
-{#                            {% if form_user.ministry %}#}
-{#                                <input class="form-control" value="{{ form_user.ministry }}" name="ministry">#}
-{#                            {% else %}#}
-{#                                <input class="form-control" value="" name="ministry">#}
-{#                            {% endif %}#}
-{#                            {% if form_user.code %}#}
-{#                                <input class="form-control" value="{{ form_user.code }}" name="code">#}
-{#                            {% else %}#}
-{#                                <input class="form-control" value="" name="code">#}
-{#                            {% endif %}#}
-{#                            {% if form_user.address %}#}
-{#                                <input class="form-control" value="{{ form_user.address }}" name="address">#}
-{#                            {% else %}#}
-{#                                <input class="form-control" value="" name="address">#}
-{#                            {% endif %}#}
-{#                            {% if form_user.cal_date %}#}
-{#                                <input class="form-control" value="{{ form_user.cal_date }}" name="cal_date" disabled>#}
-{#                            {% else %}#}
-{#                                <input class="form-control" value="" name="cal_date">#}
-{#                            {% endif %}#}
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" onclick="location.href='{% url 'manage_user' %}';"
+                                    class="btn btn-secondary" data-bs-dismiss="modal">Close
+                            </button>
                             <button type="submit" class="btn btn-primary">Save changes</button>
                         </div>
                     </div>
@@ -204,6 +194,143 @@
     {#        </div>#}
     {#    </div>#}
 
+
+    <!-- Adduser -->
+    {#    {% if exist_user or Is_passowrd %}#}
+    <form action="{% url 'manage_user' %}" method="post" id="form_new_user">
+        {% csrf_token %}
+        <div class="modal fade" id="add_user" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"
+             data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">เพิ่มผู้ใช้งาน</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                                onclick="location.href='{% url 'manage_user' %}';"></button>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="home-tab" data-bs-toggle="tab"
+                                        data-bs-target="#home-tab-pane" type="button" role="tab"
+                                        aria-controls="home-tab-pane" aria-selected="true">ผู้ใช้งาน
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="profile-tab" data-bs-toggle="tab"
+                                        data-bs-target="#profile-tab-pane" type="button" role="tab"
+                                        aria-controls="profile-tab-pane" aria-selected="false">ที่อยู่
+                                </button>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="myTabContent">
+                            <div class="tab-pane fade show active mt-2" id="home-tab-pane" role="tabpanel"
+                                 aria-labelledby="home-tab" tabindex="0">
+                                <div>
+                                    <label class="form-label">ชื่อผู้ใช้งาน</label>
+                                    {% if exist_user %}
+                                        {{ form_user_creation.username }}
+                                        <p style="color: red" class="mt-2 mb-1">ชื่อผู้ใช้นี้ซ้ำ</p>
+                                    {% else %}
+                                        {{ form_user_creation.username }}
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <label class="form-label">รหัสผ่าน</label>
+                                    {{ form_user_creation.password }}
+                                    {{ form_user_creation.password.errors }}
+                                    <span id='message_password'></span>
+                                </div>
+                                <div>
+                                    <label class="form-label">ยืนยันรหัสผ่าน</label>
+                                    <input class="form-control" name="confirm_password" id="confirm_password"
+                                           placeholder="Confirm Password" required
+                                           type="password">
+                                    <span id='message'></span>
+                                </div>
+                                <div>
+                                    <label class="form-label">บทบาท</label>
+                                    {{ form_user_creation.is_superuser }}
+                                    {{ form_user_creation.is_superuser.errors }}
+                                </div>
+                                <div>
+                                    <label class="form-label">วันที่เรียก</label>
+                                    {{ form_user_detail.cal_date }}
+                                    {{ form_user_detail.cal_date.errors }}
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel"
+                                 aria-labelledby="profile-tab"
+                                 tabindex="0">
+                                <div>
+                                    <label class="form-label">อีเมล</label>
+                                    {{ form_user_creation.email }}
+                                    {{ form_user_creation.email.errors }}
+                                </div>
+                                <div>
+                                    <label class="form-label">จังหวัด</label>
+                                    {{ form_user_detail.province }}
+                                    {{ form_user_detail.province.errors }}
+                                </div>
+                                <div>
+                                    <label class="form-label">ที่อยู่</label>
+                                    {{ form_user_detail.address }}
+                                    {{ form_user_detail.address.errors }}
+                                </div>
+                                <div>
+                                    <label class="form-label">กระทรวง</label>
+                                    {{ form_user_detail.ministry }}
+                                    {{ form_user_detail.ministry.errors }}
+                                </div>
+                                <div>
+                                    <label class="form-label">รหัสโรงพยาบาล</label>
+                                    {{ form_user_detail.code }}
+                                    {{ form_user_detail.code.errors }}
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                onclick="location.href='{% url 'manage_user' %}';">ปิด
+                        </button>
+                        <button type="submit" class="btn btn-primary">ยืนยัน</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    {#    {% endif %}#}
+
+
+    <script>
+
+        $(function () {
+            $("#datetimepicker1").datetimepicker({
+                format: 'DD/MM/YYYY HH:mm',
+            });
+        });
+
+
+        $('#username_hide').hide();
+
+        $('#password, #confirm_password').on('keyup', function () {
+            if ($('#password').val() == $('#confirm_password').val()) {
+                $('#message').html('รหัสผ่านถูกต้อง').css('color', 'green');
+            } else
+                $('#message').html('รหัสผ่านไม่ตรงกัน').css('color', 'red');
+        });
+
+        $('#password').on('keyup', function () {
+            if ($('#password').val().length >= 8) {
+                $('#message_password').html('รหัสผ่านถูกต้อง').css('color', 'green');
+            } else
+                $('#message_password').html('รหัสผ่านต้องมากกว่า 8 หลัก').css('color', 'red');
+        });
+
+    </script>
 
 
 {% endblock %}

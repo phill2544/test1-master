@@ -1,7 +1,31 @@
 {% extends 'general_app/base.html' %}
 {% block title %}Certificate{% endblock %}
 {% block content %}
-    {% csrf_token %}
+
+
+
+    {% if upload == 'upload_completed' %}
+        <script>
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2500,
+                timerProgressBar: false,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire({
+                icon: 'success',
+                title: '<strong>{{ cert_file.name }}</strong> uploaded successfully'
+
+            })
+            {#window.location.replace("{% url 'certificate' %}");#}
+        </script>
+    {% endif %}
     {% if login %}
         <script>
             const Toast = Swal.mixin({
@@ -23,7 +47,7 @@
         </script>
     {% endif %}
 
-    {% if email_authen == email_valid and request.method == 'POST' %}
+    {% if email_authen == email_valid and request.method == 'POST' and upload_completed == 'upload_completed' %}
         <script>
             const Toast = Swal.mixin({
                 toast: true,
@@ -66,7 +90,7 @@
     {% endif %}
 
 
-        {% if certificate_file %}
+    {% if certificate_file %}
         <script>
             const Toast = Swal.mixin({
                 toast: true,
@@ -89,9 +113,10 @@
 
 
 
-{#upload#}
+    {#upload#}
     {% if request.user.is_superuser %}
-        <form action="{% url 'certificate' %}" method="post">
+        <form action="{% url 'certificate' %}" method="post" enctype="multipart/form-data"
+              onsubmit="submit_file.disabled = true; return true;">
             {% csrf_token %}
             <div class="d-flex justify-content-center flex-wrap" style="margin-top: 50px">
                 <div class="p-2">
@@ -107,12 +132,12 @@
                     </datalist>
                 </div>
                 <div class="btn-group btn-group-lg p-2" role="group" aria-label="...">
-                    <button type="submit" class="btn btn-outline-success " role="group"><strong>Submit</strong></button>
+                    <button type="submit" class="btn btn-outline-success " role="group" id="submit_file"
+                            name="submit_file"><strong>Submit</strong></button>
                 </div>
             </div>
         </form>
     {% endif %}
-
 
 
     <div class="d-flex justify-content-center flex-wrap">
@@ -121,18 +146,22 @@
                 <table class="table table-lg table-hover ">
                     <thead>
                     <tr>
-                        <th scope="col">No</th>
-                        <th scope="col">File</th>
-                        <th scope="col">Date</th>
+                        <th scope="col">ลำดับที่</th>
+                        <th scope="col" style="text-align: center">ไฟล์</th>
+                        <th scope="col" style="text-align: center">วันที่</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <div class="container">
-                        {% for cert in cert %}
+                    <div class="container" onclick="location.href='{{ cert.cert.url }}';">
+                        {% for cert,cert_date in cert %}
                             <tr>
-                                <th scope="row">{{ forloop.counter }}</th>
-                                <td><a href="{{ cert.cert.url }}" target="_blank">{{ cert.cert }}</a></td>
-                                <td>{{ cert.create_date }}</td>
+                                <th scope="row" style="text-align: center">{{ forloop.counter }}</th>
+                                <td style="text-align: center"><a href="{{ cert.cert.url }}"
+                                                                  target="_blank">{{ cert.cert }}</a></td>
+
+                                {#                                    <td>{{ cert.create_date|date:"D d M Y" }}</td>#}
+                                <td style="text-align: center">{{ cert_date }}</td>
+
                             </tr>
                         {% endfor %}
                     </div>
@@ -141,7 +170,6 @@
             </div>
         </div>
     </div>
-
 
 
 

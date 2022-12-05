@@ -1,5 +1,22 @@
 {% extends 'general_app/base.html' %}
 {% block title %}UPLOAD{% endblock %}
 {% block content %}
-
+    <form action="{% url 'configuration' %}" method="post">
+        {% csrf_token %}
+        <label for="delete_date">เลือกเวลาลบไฟล์</label>
+        <select class="form-select form-control-lg" aria-label="Default select example" name="delete_date" id="delete_date">
+            {% for count in '12345'|make_list %}
+                <option value="{{ forloop.counter }}">{{ forloop.counter }}ปี</option>
+            {% endfor %}
+        </select>
+        <label for="sent_mail_date">เลือกเวลาส่งอีเมล์</label>
+        <select class="form-select form-control-lg" aria-label="Default select example" name="sent_mail_date" id="sent_mail_date">
+            {% for count in '123456789101'|make_list %}
+                <option value="{{ forloop.counter }}">{{ forloop.counter }}เดือน</option>
+            {% endfor %}
+        </select>
+     <label for="sender_mail">อีมลผู้ส่ง</label>
+    <input class="form-control form-control-lg" type="email" placeholder="example@mail.com" aria-label="" name="sender_mail" id="sender_mail">
+        <button type="submit" class="btn btn-outline-success ">ยืนยัน</button>
+    </form>
 {% endblock %}

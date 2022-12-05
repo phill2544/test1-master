@@ -24,7 +24,7 @@ class User_Detail(models.Model):
 
 
 class CertificateFile(models.Model):
-    cert = models.FileField(upload_to='document %Y/%m/%d', null=False)
+    cert = models.FileField(upload_to='Document/%Y')
     hospital = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=False)
     create_date = models.DateField(auto_now_add=True, null=False)
 
@@ -34,4 +34,10 @@ class CertificateFile(models.Model):
     @property
     def username(self):
         return self.hospital.user.username
+
+
+class Configuration(models.Model):
+    delete_date = models.IntegerField(default=3)
+    send_mail_date = models.IntegerField(default=-2)
+    sender_mail = models.EmailField(null=False)
 

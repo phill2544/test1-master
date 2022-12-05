@@ -1,22 +1,17 @@
 import datetime
 from datetime import date
-import sweetify
 from dateutil.relativedelta import relativedelta
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render
 from django.http.response import HttpResponse, HttpResponseRedirect
-from django.template import RequestContext
 from django.urls import reverse
-from .models import User_Detail, CertificateFile
+from .models import User_Detail, CertificateFile, Configuration
 from django.contrib.auth.models import User
-from .forms import User_DetailForm, UserProfileForm
+from django.contrib.auth.forms import UserCreationForm
+from .forms import User_DetailForm, UserProfileForm, UserCreationForm
 from django.conf import settings
-from . import updater
 import os
-
-from django.utils import timezone
 from django.core.mail import send_mail
 
 
@@ -48,9 +43,11 @@ def month(month):
 
 
 def delete_file():
-    print("delete file")
-    certificates = CertificateFile.objects.filter(
-        create_date__lte=date.today() + relativedelta(years=-3))  # __lte = less than or equal
+    try:
+        year = int(-Configuration.objects.get(pk=1).delete_date)
+    except:
+        year = -1
+    certificates = CertificateFile.objects.filter(create_date__lte=date.today() + relativedelta(years=year))  # __lte = less than or equal
     for certificate in certificates:
         os.remove(certificate.cert.path)
         certificate.delete()
@@ -58,7 +55,13 @@ def delete_file():
 
 
 def send_email():
-    print('send_Email', settings.EMAIL_HOST_USER)
+    try:
+        month = int(-Configuration.objects.get(pk=1).send_mail_date)
+        sender_email = Configuration.objects.get(pk=1).sender_mail
+    except:
+        month = -2
+        sender_email = 'example@mail.com'
+
     users = User_Detail.objects.filter(send_email=False)
     # for user in users:
     #     # print(type(user.cal_date.month))
@@ -71,18 +74,17 @@ def send_email():
             user.send_email = False
             user.save()
     for user in users:
-        if (user.cal_date + relativedelta(months=-2)) < date.today():
+        if (user.cal_date + relativedelta(months=month)) < date.today():
             user.cal_date = (user.cal_date + relativedelta(years=1))
             user.send_email = True
             user.save()
             send_mail(
                 "แจ้งนัดล่วงหน้าเพื่อทำการตรวจสอบเครื่องมือแพทย์",
                 f'{user.username}ขอเข้าทำการนัดล่วงหน้าเพื่อเข้าไปตรวจสอบเครื่องมือแพทย์ในภายในเดือน{month(user.cal_date.month)}',
-                settings.EMAIL_HOST_USER,
+                sender_email,
                 [user.email],
                 fail_silently=False,
             )
-
     pass
 
 
@@ -97,6 +99,7 @@ def certificate(request):
     cert = None
     email_authen = None
     email_valid = None
+    cert_date = []
     user = User.objects.get(id=request.user.id)
     if request.method == 'POST':
         try:
@@ -109,19 +112,34 @@ def certificate(request):
                 return render(request, 'general_app/Certificate.html',
                               context={'email_authen': email_authen, 'email_valid': email_valid})
         except:
-            cert = request.POST['cert_file']
+            cert_file = request.FILES['cert_file']
             hospital_id = User.objects.get(
                 username=request.POST['username']).id  # get is a object and filter is multi objects
-            certificate_file = CertificateFile.objects.create(cert=cert, hospital_id=hospital_id)
-            context = {'certificate_file': request.POST['cert_file']}
+            CertificateFile.objects.create(cert=cert_file.name, hospital_id=hospital_id)
+            fs = FileSystemStorage(location=f'media/Document{date.today().year}')
+            fs.save(cert_file.name, cert_file)
+            context = {'cert': CertificateFile.objects.filter(hospital_id=request.user.id),
+                       'upload': 'upload_completed', 'cert_file': cert_file}
             return render(request, 'general_app/Certificate.html', context)
     if request.user.is_authenticated:
         try:
             users = User.objects.all()
             cert = CertificateFile.objects.filter(hospital_id=request.user.id)
+            # date_th(cert)
         except:
-            pass
-    context = {'cert': cert, 'email_authen': email_authen, 'email_valid': email_valid, 'users': users}
+            cert = CertificateFile.objects.filter()
+    for certi in cert:
+        cert_date.append('{} {} {}'.format(certi.create_date.day, month(certi.create_date.month),
+                                           certi.create_date.year + 543))
+    #     cert_date.append(date)
+    print(cert_date[0])
+    # print(type(cert[1].create_date.year))
+    # print(int(cert[1].create_date.month))
+    # print(int(cert[1].create_date.day))
+    # date = datetime.datetime(cert[1].create_date.year + 543,cert[1].create_date.month,cert[1].create_date.day).strftime('%d/%m/%Y')
+    # print(date)
+    context = {'cert': zip(cert, cert_date), 'email_authen': email_authen, 'email_valid': email_valid, 'users': users,
+               'cert_date': cert_date}
     return render(request, 'general_app/Certificate.html', context)
 
 
@@ -162,49 +180,79 @@ def profile(request):
 
 @login_required
 def configuration(request):
-    return render(request, 'general_app/configuration.html')
+    if request.method == "POST":
+        config = Configuration.objects.get(pk=1)
+        config.send_mail_date = request.POST['send_mail_date']
+        config.delete_date = request.POST['delete_date']
+        config.save()
+        return HttpResponseRedirect(reverse("configuration"))
+    form_configuration = Configuration.objects.get(pk=1)
+    context = {'form_configuration': form_configuration}
+    return render(request, 'general_app/configuration.html', context)
 
 
 @login_required
 def manage_user(request):
+    try:
+        a = Configuration.objects.get(id=1).delete_date
+    except:
+        a = -2
+    print(a)
     users = User.objects.all()
-    print(User_Detail.objects.get(user_id=request.user.id))
-    print(request.user)
     if request.method == 'POST':
-        form_user = User_DetailForm(request.POST, instance=User_Detail.objects.get(user_id=request.user.id))
-        if form_user.is_valid():
-            form_user.save()
-            # form = form_user.save(commit=False)
-            # form.user = request.user
-            # form.save()
-    context = {'users': users}
+        form_user_detail = User_DetailForm(request.POST)
+        form_user_creation = UserCreationForm(request.POST)
+        if form_user_creation.data['password'] == form_user_creation.data['confirm_password']:
+            if form_user_detail.is_valid() and form_user_creation.is_valid():
+                form_user_creation = User.objects.create_user(request.POST['username'], request.POST['email'],
+                                                              request.POST['password'],
+                                                              is_superuser=request.POST['is_superuser'])
+                form_user_detail = User_Detail.objects.create(province=request.POST['province'],
+                                                              address=request.POST['address'],
+                                                              ministry=request.POST['ministry'],
+                                                              cal_date=request.POST['cal_date'],
+                                                              user_id=form_user_creation.id, code=request.POST['code'])
+                form_user_creation.save()
+                form_user_detail.save()
+            else:
+                form_user_creation = form_user_creation
+                form_user_detail = form_user_detail
+                form_user_creation.username = ''
+                context = {'exist_user': True, 'form_user_creation': form_user_creation,
+                           'form_user_detail': form_user_detail, 'users': users}
+                return render(request, 'general_app/manage_users.html', context)
+        else:  # password not match
+            form_user_creation = form_user_creation
+            form_user_detail = form_user_detail
+            context = {'Is_passowrd': True, 'form_user_creation': form_user_creation,
+                       'form_user_detail': form_user_detail, 'users': users}
+            return render(request, 'general_app/manage_users.html', context)
+    form_user_detail = User_DetailForm()
+    form_user_creation = UserCreationForm()
+    context = {'users': users, 'form_user_detail': form_user_detail, 'form_user_creation': form_user_creation}
     return render(request, 'general_app/manage_users.html', context)
+
 
 @login_required
 def edit_user(request, pk):
     users = User.objects.all()
     name = User_Detail.objects.get(user_id=pk)
     if request.method == 'POST':
-        form_user = User_DetailForm(request.POST, instance=User_Detail.objects.get(user_id=request.user.id))
-        if form_user.is_valid():
+        form_user_detail = User_DetailForm(request.POST, instance=User_Detail.objects.get(user_id=name.user_id))
+        form_user = UserProfileForm(request.POST, instance=User.objects.get(id=name.user_id))
+        if form_user_detail.is_valid() and form_user.is_valid():
             form_user.save()
-    # form = {
-    #     'province' : request.POST['province'],
-    #     'address' : request.POST['address'],
-    #     'code' : request.POST['code'],
-    #     'cal_date' : request.POST['cal_daet'],
-    #     'ministry' : request.POST['ministry'],
-    #
-    # }
-    # province = request.POST['province']
-    # address = request.POST['address']
-    # code = request.POST['code']
-    # cal_date = request.POST['cal_date']
-    # ministry = request.POST['ministry']
+            form_user_detail.save()
+            return HttpResponseRedirect(reverse('manage_user'))
+            # return HttpResponseRedirect(reverse('manage_user'))
     try:
-        form_user = User_DetailForm(instance=User_Detail.objects.get(user_id=pk))
+        form_user_detail = User_DetailForm(instance=User_Detail.objects.get(user_id=pk))
+        form_user = UserProfileForm(instance=User.objects.get(id=pk))
     except:
         return render(request, 'general_app/manage_users.html',
-                      context={'detail_modal': True, 'users': users, 'form_user': None, 'name': name})
-    return render(request, 'general_app/manage_users.html',
-                  context={'detail_modal': True, 'users': users, 'form_user': form_user, 'name': name})
+                      context={'detail_modal': True, 'users': users, 'form_user': None, 'name': name,
+                               'form_user_email': None})
+    context = {'detail_modal': True, 'users': users, 'form_user': form_user_detail, 'name': name,
+               'form_user_email': form_user}
+    # return reverse('manage_user',kwargs={'pk':pk })
+    return render(request, 'general_app/manage_users.html', context)

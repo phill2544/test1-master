@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os.path
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,7 +40,7 @@ INSTALLED_APPS = [
     'general_app.apps.GeneralAppConfig',
     "django_apscheduler",
     'django_bootstrap_icons',
-    'sweetify'
+    'sweetify',
 ]
 
 MIDDLEWARE = [
@@ -122,11 +123,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-import os
 
 STATIC_URL = 'static/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+STATICFILES_DIRS = [
+    BASE_DIR / 'static'
+]
 MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # EMAIL_HOST = 'smtp.mailtrap.io'
 # EMAIL_HOST_USER = 'cd7537bb0b0bbf'
