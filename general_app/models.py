@@ -25,14 +25,14 @@ class Configuration(models.Model):
 
 
 class Province(models.Model):
-    province = models.CharField(max_length=20, null=True)
+    province = models.CharField(max_length=20, null=True, blank=True)
 
     def __str__(self):
         return str(self.province)
 
 
 class Ministry(models.Model):
-    ministry = models.CharField(max_length=60, null=True)
+    ministry = models.CharField(max_length=60, null=True, blank=True)
 
     def __str__(self):
         return str(self.ministry)
@@ -40,14 +40,15 @@ class Ministry(models.Model):
 
 class User_Detail(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    address = models.TextField(blank=True)
-    province = models.CharField(max_length=60, blank=True)
-    ministry = models.CharField(max_length=60, blank=True)
-    code = models.CharField(max_length=7, blank=True)
-    cal_date = models.DateField(null=False)
-    send_email = models.BooleanField(default=False)
-    province_name = models.OneToOneField(Province, on_delete=models.CASCADE, null=True)
-    ministry_name = models.OneToOneField(Ministry, on_delete=models.CASCADE, null=True)
+    address = models.TextField( null=True, blank=True)
+    province = models.ForeignKey(Province, on_delete=models.DO_NOTHING, null=True, blank=True)
+    ministry = models.ForeignKey(Ministry, on_delete=models.DO_NOTHING, null=True, blank=True)
+    code = models.CharField(max_length=7,  null=True, blank=True)
+    cal_date = models.DateField( null=True, blank=True)
+    send_email = models.BooleanField( null=True, blank=True)
+
+    # province_name = models.OneToOneField(Province, on_delete=models.CASCADE, null=True)
+    # ministry_name = models.OneToOneField(Ministry, on_delete=models.CASCADE, null=True)
 
     @property
     def email(self):

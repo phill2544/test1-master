@@ -210,13 +210,18 @@ def manage_user(request):
                 form_user_creation = User.objects.create_user(request.POST['username'], request.POST['email'],
                                                               request.POST['password'],
                                                               is_superuser=request.POST['is_superuser'])
-                form_user_detail = User_Detail.objects.create(province=request.POST['province'],
+                form_user_detail = User_Detail.objects.create(province_id=request.POST['province'],
                                                               address=request.POST['address'],
-                                                              ministry=request.POST['ministry'],
+                                                              ministry_id=request.POST['ministry'],
                                                               cal_date=request.POST['cal_date'],
                                                               user_id=form_user_creation.id, code=request.POST['code'])
                 form_user_creation.save()
                 form_user_detail.save()
+                form_user_detail = User_DetailForm()
+                form_user_creation = UserCreationForm()
+                context = {'add_user': True, 'users': users,'form_user_creation': form_user_creation,
+                           'form_user_detail': form_user_detail,'username':request.POST['username']}
+                return render(request, 'general_app/manage_users.html', context)
             else:
                 form_user_creation = form_user_creation
                 form_user_detail = form_user_detail

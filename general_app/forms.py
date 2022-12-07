@@ -10,13 +10,8 @@ class User_DetailForm(forms.ModelForm):
         fields = ('address', 'province', 'ministry', 'code', 'cal_date')
         widgets = {
             'address': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'ที่อยู่', 'rows': '3'}),
-            'province': forms.Select(choices=(
-                ('ขอนแก่น', 'ขอนแก่น'),
-                ('มหาสารคาม', 'มหาสารคาม'),
-                ('ร้อยเอ็ด', 'ร้อยเอ็ด'),
-                ('กาฬสินธุ์', 'กาฬสินธุ์'),
-            ), attrs={'class': 'form-control', 'placeholder': 'ขอนแก่น'}),
-            'ministry': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'กระทรวงสาธารณสุข'}),
+            'province': forms.Select(attrs={'class': 'form-control','placeholder': 'ขอนแก่น'}),
+            'ministry': forms.Select(attrs={'class': 'form-control','placeholder': 'ขอนแก่น'}),
             'code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '1234567'}),
             'cal_date': forms.DateInput(format=('%Y-%m-%d'),
                                         attrs={'class': 'form-control', 'placeholder': 'Select Date', 'type': 'date',

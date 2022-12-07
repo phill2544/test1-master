@@ -30,18 +30,19 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-     "debug_toolbar",
-     'users_app.apps.UsersAppConfig',
-     'django.contrib.admin',
-     'django.contrib.auth',
-     'django.contrib.contenttypes',
-     'django.contrib.sessions',
-     'django.contrib.messages',
-     'django.contrib.staticfiles',
-     'general_app.apps.GeneralAppConfig',
-     "django_apscheduler",
-     'django_bootstrap_icons',
-     'sweetify',
+    "debug_toolbar",
+    'users_app.apps.UsersAppConfig',
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'general_app.apps.GeneralAppConfig',
+    "django_apscheduler",
+    'django_bootstrap_icons',
+    'sweetify',
+    "crispy_forms",
 
 ]
 
@@ -167,3 +168,5 @@ SWEETIFY_SWEETALERT_LIBRARY = 'sweetalert2'
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
+CRISPY_TEMPLATE_PACK = "bootstrap4"

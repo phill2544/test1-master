@@ -8,6 +8,27 @@
             })
         </script>
     {% endif %}
+
+    {% if add_user %}
+        <script>
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: false,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire({
+                icon: 'success',
+                title: 'เพิ่ม {{ username }} เสร็จสิ้น'
+            })
+        </script>
+    {% endif %}
     <div class="d-flex justify-content-center flex-wrap">
 
         <div class="table-responsive w-75 p-5">
@@ -33,7 +54,7 @@
                         <td>{{ user.email }}</td>
                         <td style="text-align: center">
                             {% if user.is_superuser %}
-                                <span class="badge rounded-pill bg-success" >ผู้ดูแลระบบ</span>
+                                <span class="badge rounded-pill bg-success">ผู้ดูแลระบบ</span>
                             {% else %}
                                 <span class="badge rounded-pill bg-primary" style="width: 75px">ผู้ใช้งาน</span>
                             {% endif %}
@@ -68,40 +89,43 @@
                                     onclick="location.href='{% url 'manage_user' %}';"></button>
                         </div>
                         <div class="modal-body">
-                            <div>
-                                <label class="form-label">Address</label>
-                                {{ form_user.address }}
-                                {{ form_user.address.errors }}
+                            <div class="container">
+                                <div>
+                                    <label class="form-label">ที่อยู่</label>
+                                    {{ form_user.address }}
+                                    {{ form_user.address.errors }}
+                                </div>
+                                <div>
+                                    <label class="form-label">อีเมล</label>
+                                    {{ form_user_email.email }}
+                                    {{ form_user_email.email.errors }}
+                                </div>
+                                <div id="divCheckbox" style="display: none;">
+                                    {{ form_user_email.username }}
+                                    {{ form_user_email.username.errors }}
+                                </div>
+                                <div>
+                                    <label class="form-label">รหัส</label>
+                                    {{ form_user.code }}
+                                    {{ form_user.code.errors }}
+                                </div>
+                                <div>
+                                    <label class="form-label">จังหวัด</label>
+                                    {{ form_user.province }}
+                                    {{ form_user.province.errors }}
+                                </div>
+                                <div>
+                                    <label class="form-label">กระทรวง</label>
+                                    {{ form_user.ministry }}
+                                    {{ form_user.ministry.errors }}
+                                </div>
+                                <div>
+                                    <label class="form-label">วันที่เรียก</label>
+                                    {{ form_user.cal_date }}
+                                    {{ form_user.cal_date.errors }}
+                                </div>
                             </div>
-                            <div>
-                                <label class="form-label">Email</label>
-                                {{ form_user_email.email }}
-                                {{ form_user_email.email.errors }}
-                            </div>
-                            <div id="divCheckbox" style="display: none;">
-                                {{ form_user_email.username }}
-                                {{ form_user_email.username.errors }}
-                            </div>
-                            <div>
-                                <label class="form-label">Code</label>
-                                {{ form_user.code }}
-                                {{ form_user.code.errors }}
-                            </div>
-                            <div>
-                                <label class="form-label">Ministry</label>
-                                {{ form_user.ministry }}
-                                {{ form_user.ministry.errors }}
-                            </div>
-                            <div>
-                                <label class="form-label">Province</label>
-                                {{ form_user.province }}
-                                {{ form_user.province.errors }}
-                            </div>
-                            <div>
-                                <label class="form-label">Cal_date</label>
-                                {{ form_user.cal_date }}
-                                {{ form_user.cal_date.errors }}
-                            </div>
+
                         </div>
                         <div class="modal-footer">
                             <button type="button" onclick="location.href='{% url 'manage_user' %}';"
@@ -239,7 +263,8 @@
                                     <label class="form-label">รหัสผ่าน</label>
                                     {{ form_user_creation.password }}
                                     {{ form_user_creation.password.errors }}
-                                    <span id='message_password'></span>
+                                    <p id='message_password' class="mb-0"></p>
+                                    <input type="checkbox" onclick="show_password1()" class="my-2">แสดงรหัสผ่าน
                                 </div>
                                 <div>
                                     <label class="form-label">ยืนยันรหัสผ่าน</label>
@@ -317,7 +342,7 @@
         $('#username_hide').hide();
 
         $('#password, #confirm_password').on('keyup', function () {
-            if ($('#password').val() == $('#confirm_password').val()) {
+            if ($('#password').val() == $('#confirm_password').val() && $('#password').val() != '') {
                 $('#message').html('รหัสผ่านถูกต้อง').css('color', 'green');
             } else
                 $('#message').html('รหัสผ่านไม่ตรงกัน').css('color', 'red');
@@ -329,6 +354,16 @@
             } else
                 $('#message_password').html('รหัสผ่านต้องมากกว่า 8 หลัก').css('color', 'red');
         });
+
+        function show_password1() {
+            var password1 = document.getElementById("password");
+
+            if (password1.type === "password") {
+                password1.type = "text";
+            } else {
+                password1.type = "password";
+            }
+        }
 
     </script>
 

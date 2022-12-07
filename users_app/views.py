@@ -2,7 +2,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
-
 # Create your views here.
 from django.urls import reverse
 from general_app.models import CertificateFile
@@ -10,12 +9,10 @@ from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import render, redirect
+from django.contrib.auth.views import PasswordChangeView
 
-def change_password(request):
-    if request.method == 'POST':
-        user = User.objects.get(username__exact=request.user)
-        user.set_password(request.POST['new_password2'])
-    return render(request,'registration/password_change_form.html')
+# def change_password(request,PasswordChangeView):
+#     form_class = PasswordChangingForm
 
 def login_user(request):
     if not request.user.is_authenticated:  # not login yet
