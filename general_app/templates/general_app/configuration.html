@@ -1,22 +1,151 @@
 {% extends 'general_app/base.html' %}
 {% block title %}UPLOAD{% endblock %}
 {% block content %}
-    <form action="{% url 'configuration' %}" method="post">
+
+    {% if state %}
+        <script>
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: false,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire({
+                icon: 'success',
+                title: '{{ state }}'
+            })
+        </script>
+    {% endif %}
+    <div class="container">
+        <form action="{% url 'configuration' %}" method="post">
+            {% csrf_token %}
+            <label for="sender_mail">จังหวัด</label>
+            <div class="d-flex bd-highlight">
+                <div class="w-100 bd-highlight">
+                    <select class="form-select form-select-lg" aria-label="Default select example"
+                            name="select_province">
+                        {% for province in province %}
+                            <option value={{ province }}>{{ province }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mx-2 flex-shrink-1 bd-highlight">
+                    <button type="submit" class="btn btn-danger btn-lg"
+                            name="btn_delete_province" {% if province %}{% else %}disabled{% endif %}>
+                        ลบ
+                    </button>
+                </div>
+                <div class="flex-shrink-1 bd-highlight">
+                    <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal"
+                            data-bs-target="#add_province">
+                        เพิ่ม
+                    </button>
+                </div>
+            </div>
+        </form>
+        <form action="{% url 'configuration' %}" method="post">
+            {% csrf_token %}
+            <label for="sender_mail">กระทรวง</label>
+            <div class=" d-flex bd-highlight">
+                <div class="w-100 bd-highlight">
+                    <select class="form-select form-select-lg" aria-label="Default select example"
+                            name="select_ministry">
+                        {% for ministry in ministry %}
+                            <option value={{ ministry }}>{{ ministry }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mx-2 flex-shrink-1 bd-highlight">
+                    <button type="submit" class="btn btn-danger btn-lg" name="btn_delete_ministry" {% if ministry %}{% else %}disabled{% endif %}>
+                        ลบ
+                    </button>
+                </div>
+                <div class="flex-shrink-1 bd-highlight">
+                    <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal"
+                            data-bs-target="#add_ministry">
+                        เพิ่ม
+                    </button>
+                </div>
+            </div>
+        </form>
+        <form action="{% url 'configuration' %}" method="post">
+            {% csrf_token %}
+            <label for="delete_date">เลือกเวลาลบไฟล์</label>
+            <select class="form-select form-control-lg" aria-label="Default select example" name="delete_date"
+                    id="delete_date">
+                {% for count in '12345'|make_list %}
+                    <option value="{{ forloop.counter }}"
+                            {% if forloop.counter == form_configuration.delete_date %}selected {% else %}{% endif %}>{{ forloop.counter }}ปี
+                    </option>
+                {% endfor %}
+            </select>
+            <label for="sent_mail_date">เลือกเวลาส่งอีเมล์</label>
+            <select class="form-select form-control-lg" aria-label="Default select example" name="send_mail_date"
+                    id="send_mail_date">
+                {% for count in '123456789101'|make_list %}
+                    <option value="{{ forloop.counter }}"
+                            {% if forloop.counter == form_configuration.send_mail_date %}selected {% else %}{% endif %}>{{ forloop.counter }}เดือน
+                    </option>
+                {% endfor %}
+            </select>
+            <label for="sender_mail">อีมลผู้ส่ง</label>
+            <input class="form-control form-control-lg" type="email" placeholder="example@mail.com" aria-label=""
+                   name="sender_mail" id="sender_mail"
+                   {% if form_configuration.sender_mail %}value="{{ form_configuration.sender_mail }}" {% else %}{% endif %}>
+            <button type="submit" class="mt-2 btn btn-success btn-lg">บันทึก</button>
+        </form>
+    </div>
+
+    {#    add_province#}
+    <form action="{% url 'configuration' %}" method="POST" name="add_province">
         {% csrf_token %}
-        <label for="delete_date">เลือกเวลาลบไฟล์</label>
-        <select class="form-select form-control-lg" aria-label="Default select example" name="delete_date" id="delete_date">
-            {% for count in '12345'|make_list %}
-                <option value="{{ forloop.counter }}">{{ forloop.counter }}ปี</option>
-            {% endfor %}
-        </select>
-        <label for="sent_mail_date">เลือกเวลาส่งอีเมล์</label>
-        <select class="form-select form-control-lg" aria-label="Default select example" name="sent_mail_date" id="sent_mail_date">
-            {% for count in '123456789101'|make_list %}
-                <option value="{{ forloop.counter }}">{{ forloop.counter }}เดือน</option>
-            {% endfor %}
-        </select>
-     <label for="sender_mail">อีมลผู้ส่ง</label>
-    <input class="form-control form-control-lg" type="email" placeholder="example@mail.com" aria-label="" name="sender_mail" id="sender_mail">
-        <button type="submit" class="btn btn-outline-success ">ยืนยัน</button>
+        <div class="modal fade" id="add_province" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">เพิ่มจังหวัด</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input class="form-control form-control-lg" type="text" name="add_province">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                        <button type="submit" class="btn btn-primary">ยืนยัน</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </form>
+
+
+
+    {#    add_ministry#}
+    <form action="{% url 'configuration' %}" method="post" name="add_ministry">
+        {% csrf_token %}
+        <div class="modal fade" id="add_ministry" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input class="form-control form-control-lg" type="text" name="add_ministry">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                        <button type="submit" class="btn btn-primary">บันทึก</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
 {% endblock %}

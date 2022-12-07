@@ -30,20 +30,23 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'users_app.apps.UsersAppConfig',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'general_app.apps.GeneralAppConfig',
-    "django_apscheduler",
-    'django_bootstrap_icons',
-    'sweetify',
+     "debug_toolbar",
+     'users_app.apps.UsersAppConfig',
+     'django.contrib.admin',
+     'django.contrib.auth',
+     'django.contrib.contenttypes',
+     'django.contrib.sessions',
+     'django.contrib.messages',
+     'django.contrib.staticfiles',
+     'general_app.apps.GeneralAppConfig',
+     "django_apscheduler",
+     'django_bootstrap_icons',
+     'sweetify',
+
 ]
 
 MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -51,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'Cert_upload.urls'
@@ -159,3 +163,7 @@ SCHEDULER_DEFAULT = True
 APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
 
 SWEETIFY_SWEETALERT_LIBRARY = 'sweetalert2'
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]

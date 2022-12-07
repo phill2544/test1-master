@@ -23,7 +23,7 @@
                 title: '<strong>{{ cert_file.name }}</strong> uploaded successfully'
 
             })
-            {#window.location.replace("{% url 'certificate' %}");#}
+            window.location.replace("{% url 'certificate' %}");
         </script>
     {% endif %}
     {% if login %}
@@ -133,7 +133,7 @@
                 </div>
                 <div class="btn-group btn-group-lg p-2" role="group" aria-label="...">
                     <button type="submit" class="btn btn-outline-success " role="group" id="submit_file"
-                            name="submit_file"><strong>Submit</strong></button>
+                            name="submit_file"><strong>ยืนยัน</strong></button>
                 </div>
             </div>
         </form>

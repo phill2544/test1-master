@@ -6,9 +6,8 @@ from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
-from .models import User_Detail, CertificateFile, Configuration
+from .models import User_Detail, CertificateFile, Configuration, Province, Ministry
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm
 from .forms import User_DetailForm, UserProfileForm, UserCreationForm
 from django.conf import settings
 import os
@@ -47,7 +46,8 @@ def delete_file():
         year = int(-Configuration.objects.get(pk=1).delete_date)
     except:
         year = -1
-    certificates = CertificateFile.objects.filter(create_date__lte=date.today() + relativedelta(years=year))  # __lte = less than or equal
+    certificates = CertificateFile.objects.filter(
+        create_date__lte=date.today() + relativedelta(years=year))  # __lte = less than or equal
     for certificate in certificates:
         os.remove(certificate.cert.path)
         certificate.delete()
@@ -88,14 +88,8 @@ def send_email():
     pass
 
 
-# Create your views here.
-def home(request):
-    return HttpResponse('Hello')
-
-
 @login_required
 def certificate(request):
-    print(request.user.is_superuser)
     cert = None
     email_authen = None
     email_valid = None
@@ -131,13 +125,6 @@ def certificate(request):
     for certi in cert:
         cert_date.append('{} {} {}'.format(certi.create_date.day, month(certi.create_date.month),
                                            certi.create_date.year + 543))
-    #     cert_date.append(date)
-    print(cert_date[0])
-    # print(type(cert[1].create_date.year))
-    # print(int(cert[1].create_date.month))
-    # print(int(cert[1].create_date.day))
-    # date = datetime.datetime(cert[1].create_date.year + 543,cert[1].create_date.month,cert[1].create_date.day).strftime('%d/%m/%Y')
-    # print(date)
     context = {'cert': zip(cert, cert_date), 'email_authen': email_authen, 'email_valid': email_valid, 'users': users,
                'cert_date': cert_date}
     return render(request, 'general_app/Certificate.html', context)
@@ -180,14 +167,31 @@ def profile(request):
 
 @login_required
 def configuration(request):
-    if request.method == "POST":
-        config = Configuration.objects.get(pk=1)
-        config.send_mail_date = request.POST['send_mail_date']
-        config.delete_date = request.POST['delete_date']
-        config.save()
-        return HttpResponseRedirect(reverse("configuration"))
     form_configuration = Configuration.objects.get(pk=1)
-    context = {'form_configuration': form_configuration}
+    province = Province.objects.all()
+    ministry = Ministry.objects.all()
+    state = None
+    if request.method == "POST":
+        if 'add_province' in request.POST:
+            Province.objects.create(province=request.POST['add_province'])
+            request.state = state = 'เพิ่มจังหวัด {} เสร็จสิ้น'.format(request.POST['add_province'])
+        elif 'add_ministry' in request.POST:
+            Ministry.objects.create(ministry=request.POST['add_ministry'])
+            request.state = state = 'เพิ่มกระทรวง {} เสร็จสิ้น'.format(request.POST['add_ministry'])
+        elif 'select_province' in request.POST:
+            Province.objects.filter(province=request.POST['select_province']).delete()
+            request.state = state = 'ลบจังหวัด {} เสร็จสิ้น'.format(request.POST['select_province'])
+        elif 'select_ministry' in request.POST:
+            Ministry.objects.filter(ministry=request.POST['select_ministry']).delete()
+            request.state = state = 'ลบกระทรวง {} เสร็จสิ้น'.format(request.POST['select_ministry'])
+        else:
+            config = Configuration.objects.get(pk=1)
+            config.send_mail_date = request.POST['send_mail_date']
+            config.delete_date = request.POST['delete_date']
+            config.sender_mail = request.POST['sender_mail']
+            config.save()
+            state = 'เปลี่ยนการตั้งค่าเสร็จสิ้น'
+    context = {'form_configuration': form_configuration, 'province': province, 'ministry': ministry,'state':state}
     return render(request, 'general_app/configuration.html', context)
 
 
@@ -197,7 +201,6 @@ def manage_user(request):
         a = Configuration.objects.get(id=1).delete_date
     except:
         a = -2
-    print(a)
     users = User.objects.all()
     if request.method == 'POST':
         form_user_detail = User_DetailForm(request.POST)
