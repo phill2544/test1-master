@@ -6,7 +6,7 @@ from django.contrib.auth.models import AbstractUser, User
 
 # Create your models here
 class CertificateFile(models.Model):
-    cert = models.FileField(upload_to='Document/%Y')
+    cert = models.FileField(upload_to='Document%Y')
     hospital = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=False)
     create_date = models.DateField(auto_now_add=True, null=False)
 
@@ -22,7 +22,8 @@ class Configuration(models.Model):
     delete_date = models.IntegerField(default=3)
     send_mail_date = models.IntegerField(default=-2)
     sender_mail = models.EmailField(null=False)
-
+    sender_mail_status = models.BooleanField(null=False,default=0)
+    delete_date_status = models.BooleanField(null=False,default=0)
 
 class Province(models.Model):
     province = models.CharField(max_length=20, null=True, blank=True)
@@ -41,14 +42,11 @@ class Ministry(models.Model):
 class User_Detail(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     address = models.TextField( null=True, blank=True)
-    province = models.ForeignKey(Province, on_delete=models.DO_NOTHING, null=True, blank=True)
-    ministry = models.ForeignKey(Ministry, on_delete=models.DO_NOTHING, null=True, blank=True)
+    province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, blank=True)
+    ministry = models.ForeignKey(Ministry, on_delete=models.SET_NULL, null=True, blank=True)
     code = models.CharField(max_length=7,  null=True, blank=True)
     cal_date = models.DateField( null=True, blank=True)
     send_email = models.BooleanField( null=True, blank=True)
-
-    # province_name = models.OneToOneField(Province, on_delete=models.CASCADE, null=True)
-    # ministry_name = models.OneToOneField(Ministry, on_delete=models.CASCADE, null=True)
 
     @property
     def email(self):

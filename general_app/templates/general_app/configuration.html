@@ -1,7 +1,6 @@
 {% extends 'general_app/base.html' %}
 {% block title %}UPLOAD{% endblock %}
 {% block content %}
-
     {% if state %}
         <script>
             const Toast = Swal.mixin({
@@ -22,13 +21,13 @@
             })
         </script>
     {% endif %}
-    <div class="container">
-        <form action="{% url 'configuration' %}" method="post">
+    <div class="container w-75">
+        <form action="{% url 'configuration' %}" method="post" class="mt-3">
             {% csrf_token %}
             <label for="sender_mail">จังหวัด</label>
             <div class="d-flex bd-highlight">
                 <div class="w-100 bd-highlight">
-                    <select class="form-select form-select-lg" aria-label="Default select example"
+                    <select class="form-select form-select-lg mb-3" aria-label="Default select example"
                             name="select_province">
                         {% for province in province %}
                             <option value={{ province }}>{{ province }}</option>
@@ -49,7 +48,9 @@
                 </div>
             </div>
         </form>
-        <form action="{% url 'configuration' %}" method="post">
+
+
+        <form action="{% url 'configuration' %}" method="post" class="mb-3">
             {% csrf_token %}
             <label for="sender_mail">กระทรวง</label>
             <div class=" d-flex bd-highlight">
@@ -62,7 +63,8 @@
                     </select>
                 </div>
                 <div class="mx-2 flex-shrink-1 bd-highlight">
-                    <button type="submit" class="btn btn-danger btn-lg" name="btn_delete_ministry" {% if ministry %}{% else %}disabled{% endif %}>
+                    <button type="submit" class="btn btn-danger btn-lg" name="btn_delete_ministry"
+                            {% if ministry %}{% else %}disabled{% endif %}>
                         ลบ
                     </button>
                 </div>
@@ -74,28 +76,69 @@
                 </div>
             </div>
         </form>
-        <form action="{% url 'configuration' %}" method="post">
+
+
+        <form action="{% url 'configuration' %}" method="post" class="">
             {% csrf_token %}
             <label for="delete_date">เลือกเวลาลบไฟล์</label>
-            <select class="form-select form-control-lg" aria-label="Default select example" name="delete_date"
-                    id="delete_date">
-                {% for count in '12345'|make_list %}
-                    <option value="{{ forloop.counter }}"
-                            {% if forloop.counter == form_configuration.delete_date %}selected {% else %}{% endif %}>{{ forloop.counter }}ปี
-                    </option>
-                {% endfor %}
-            </select>
-            <label for="sent_mail_date">เลือกเวลาส่งอีเมล์</label>
-            <select class="form-select form-control-lg" aria-label="Default select example" name="send_mail_date"
-                    id="send_mail_date">
-                {% for count in '123456789101'|make_list %}
-                    <option value="{{ forloop.counter }}"
-                            {% if forloop.counter == form_configuration.send_mail_date %}selected {% else %}{% endif %}>{{ forloop.counter }}เดือน
-                    </option>
-                {% endfor %}
-            </select>
+            <div class=" d-flex bd-highlight">
+                <div class="w-100 bd-highlight">
+                    <select class="form-select form-select-lg mb-3" aria-label="Default select example"
+                            name="delete_date"
+                            id="delete_date" {% if not form_configuration.delete_date_status %}disabled{% endif %}>
+                        {% for count in '12345'|make_list %}
+                            <option value="{{ forloop.counter }}"
+                                    {% if forloop.counter == form_configuration.delete_date %}selected {% else %}{% endif %}>{{ forloop.counter }}ปี
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="ms-2 flex-shrink-1 bd-highlight">
+                    {% if form_configuration.delete_date_status %}
+                        <button type="submit" class="btn btn-success btn-lg" name="is_delete">เปิด</button>
+                    {% else %}
+                        <button type="submit" class="btn btn-outline-secondary btn-lg" name="is_delete">ปิด</button>
+                    {% endif %}
+                </div>
+            </div>
+
+            <label for="sent_mail_date">เลือกเวลาส่งอีเมล</label>
+            <div class=" d-flex bd-highlight">
+                <div class="w-100 bd-highlight">
+                    <select class="form-select form-select-lg mb-3" aria-label="Default select example"
+                            name="send_mail_date"
+                            id="send_mail_date" {% if not form_configuration.sender_mail_status %}disabled{% endif %}>
+                        {% for count in '123456'|make_list %}
+                            <option value="{{ forloop.counter }}"
+                                    {% if forloop.counter == form_configuration.send_mail_date %}selected {% else %}{% endif %}>{{ forloop.counter }}เดือน
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="ms-2 flex-shrink-1 bd-highlight">
+                   {% if form_configuration.sender_mail_status %}
+                        <button type="submit" class="btn btn-success btn-lg" name="is_send">เปิด</button>
+                    {% else %}
+                        <button type="submit" class="btn btn-outline-secondary btn-lg" name="is_send">ปิด</button>
+                    {% endif %}
+
+                </div>
+            </div>
+
+
+            {#            <label for="sent_mail_date">เลือกเวลาส่งอีเมล</label>#}
+            {#            <select class="form-select form-control-lg" aria-label="Default select example" name="send_mail_date"#}
+            {#                    id="send_mail_date">#}
+            {#                {% for count in '123456789101'|make_list %}#}
+            {#                    <option value="{{ forloop.counter }}"#}
+            {#                            {% if forloop.counter == form_configuration.send_mail_date %}selected {% else %}{% endif %}>{{ forloop.counter }}เดือน#}
+            {#                    </option>#}
+            {#                {% endfor %}#}
+            {#            </select>#}
+
+
             <label for="sender_mail">อีมลผู้ส่ง</label>
-            <input class="form-control form-control-lg" type="email" placeholder="example@mail.com" aria-label=""
+            <input class="form-control form-control-lg mb-3" type="email" placeholder="example@mail.com" aria-label=""
                    name="sender_mail" id="sender_mail"
                    {% if form_configuration.sender_mail %}value="{{ form_configuration.sender_mail }}" {% else %}{% endif %}>
             <button type="submit" class="mt-2 btn btn-success btn-lg">บันทึก</button>
@@ -133,11 +176,11 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">เพิ่มกระทรวง</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <input class="form-control form-control-lg" type="text" name="add_ministry">
+                        <input class="form-control form-control-lg" type="text" name="add_ministry" >
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
@@ -147,5 +190,6 @@
             </div>
         </div>
     </form>
+
 
 {% endblock %}

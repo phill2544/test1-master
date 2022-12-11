@@ -1,4 +1,5 @@
 import datetime
+import json
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.decorators import login_required
@@ -42,49 +43,55 @@ def month(month):
 
 
 def delete_file():
-    try:
-        year = int(-Configuration.objects.get(pk=1).delete_date)
-    except:
-        year = -1
-    certificates = CertificateFile.objects.filter(
-        create_date__lte=date.today() + relativedelta(years=year))  # __lte = less than or equal
-    for certificate in certificates:
-        os.remove(certificate.cert.path)
-        certificate.delete()
+    if Configuration.objects.get(pk=1).delete_date_status:
+        try:
+            year = int(-Configuration.objects.get(pk=1).delete_date)
+        except:
+            year = -1
+        certificates = CertificateFile.objects.filter(
+            create_date__lte=date.today() + relativedelta(years=year))  # __lte = less than or equal
+        for certificate in certificates:
+            os.remove(certificate.cert.path)
+            certificate.delete()
+    else:
+        pass
     pass
 
 
 def send_email():
-    try:
-        month = int(-Configuration.objects.get(pk=1).send_mail_date)
-        sender_email = Configuration.objects.get(pk=1).sender_mail
-    except:
-        month = -2
-        sender_email = 'example@mail.com'
+    if Configuration.objects.get(pk=1).sender_mail_status:
+        try:
+            month = int(-Configuration.objects.get(pk=1).send_mail_date)
+            sender_email = Configuration.objects.get(pk=1).sender_mail
+        except:
+            month = -2
+            sender_email = 'example@mail.com'
 
-    users = User_Detail.objects.filter(send_email=False)
-    # for user in users:
-    #     # print(type(user.cal_date.month))
-    #     user.cal_date = date.today()
-    #     user.save()
-    #     print(user.email)
-    if not users:  # No users send email = False
-        users = User_Detail.objects.all()
+        users = User_Detail.objects.filter(send_email=False)
+        # for user in users:
+        #     # print(type(user.cal_date.month))
+        #     user.cal_date = date.today()
+        #     user.save()
+        #     print(user.email)
+        if not users:  # No users send email = False
+            users = User_Detail.objects.all()
+            for user in users:
+                user.send_email = False
+                user.save()
         for user in users:
-            user.send_email = False
-            user.save()
-    for user in users:
-        if (user.cal_date + relativedelta(months=month)) < date.today():
-            user.cal_date = (user.cal_date + relativedelta(years=1))
-            user.send_email = True
-            user.save()
-            send_mail(
-                "แจ้งนัดล่วงหน้าเพื่อทำการตรวจสอบเครื่องมือแพทย์",
-                f'{user.username}ขอเข้าทำการนัดล่วงหน้าเพื่อเข้าไปตรวจสอบเครื่องมือแพทย์ในภายในเดือน{month(user.cal_date.month)}',
-                sender_email,
-                [user.email],
-                fail_silently=False,
-            )
+            if (user.cal_date + relativedelta(months=month)) < date.today():
+                user.cal_date = (user.cal_date + relativedelta(years=1))
+                user.send_email = True
+                user.save()
+                send_mail(
+                    "แจ้งนัดล่วงหน้าเพื่อทำการตรวจสอบเครื่องมือแพทย์",
+                    f'{user.username}ขอเข้าทำการนัดล่วงหน้าเพื่อเข้าไปตรวจสอบเครื่องมือแพทย์ในภายในเดือน{month(user.cal_date.month)}',
+                    sender_email,
+                    [user.email],
+                    fail_silently=False,
+                )
+    else:
+        pass
     pass
 
 
@@ -95,8 +102,22 @@ def certificate(request):
     email_valid = None
     cert_date = []
     user = User.objects.get(id=request.user.id)
-    if request.method == 'POST':
+    if request.user.is_authenticated:
         try:
+            users = User.objects.all()
+            if request.user.is_superuser:
+                certs = CertificateFile.objects.filter()
+            else:
+                certs = CertificateFile.objects.filter(hospital_id=request.user.id)
+            # date_th(cert)
+        except:
+            certs = CertificateFile.objects.filter()
+    for certi in certs:
+        cert_date.append('{} {} {}'.format(certi.create_date.day, month(certi.create_date.month),
+                                           certi.create_date.year + 543))
+
+    if request.method == 'POST':
+        if 'email' in request.POST:
             email_authen = request.POST['email']
             email_valid = request.POST['email_valid']
             if email_authen == email_valid:
@@ -105,28 +126,27 @@ def certificate(request):
             else:
                 return render(request, 'general_app/Certificate.html',
                               context={'email_authen': email_authen, 'email_valid': email_valid})
-        except:
+        elif request.FILES:
             cert_file = request.FILES['cert_file']
             hospital_id = User.objects.get(
                 username=request.POST['username']).id  # get is a object and filter is multi objects
             CertificateFile.objects.create(cert=cert_file.name, hospital_id=hospital_id)
-            fs = FileSystemStorage(location=f'media/Document{date.today().year}')
+            print(CertificateFile.cert)
+            fs = FileSystemStorage()
             fs.save(cert_file.name, cert_file)
             context = {'cert': CertificateFile.objects.filter(hospital_id=request.user.id),
-                       'upload': 'upload_completed', 'cert_file': cert_file}
+                       'upload': 'upload_completed', 'cert_file': cert_file, 'certs': zip(certs, cert_date)}
             return render(request, 'general_app/Certificate.html', context)
-    if request.user.is_authenticated:
-        try:
-            users = User.objects.all()
-            cert = CertificateFile.objects.filter(hospital_id=request.user.id)
-            # date_th(cert)
-        except:
-            cert = CertificateFile.objects.filter()
-    for certi in cert:
-        cert_date.append('{} {} {}'.format(certi.create_date.day, month(certi.create_date.month),
-                                           certi.create_date.year + 543))
-    context = {'cert': zip(cert, cert_date), 'email_authen': email_authen, 'email_valid': email_valid, 'users': users,
-               'cert_date': cert_date}
+        elif 'delete_file' in request.POST:
+            delete_files = str(request.POST)
+            delete_files = delete_files[delete_files.index('delete_file') + 16:delete_files.index(']}>') - 5].split(',')
+            for delete_file in delete_files:
+                certificate_file = CertificateFile.objects.get(pk=delete_file)
+                os.remove(certificate_file.cert.path)
+                certificate_file.delete()
+            return HttpResponseRedirect(reverse('certificate'))
+    context = {'certs': zip(certs, cert_date), 'email_authen': email_authen, 'email_valid': email_valid,
+               'users': users, }
     return render(request, 'general_app/Certificate.html', context)
 
 
@@ -174,16 +194,22 @@ def configuration(request):
     if request.method == "POST":
         if 'add_province' in request.POST:
             Province.objects.create(province=request.POST['add_province'])
-            request.state = state = 'เพิ่มจังหวัด {} เสร็จสิ้น'.format(request.POST['add_province'])
+            state = 'เพิ่มจังหวัด {} เสร็จสิ้น'.format(request.POST['add_province'])
         elif 'add_ministry' in request.POST:
             Ministry.objects.create(ministry=request.POST['add_ministry'])
-            request.state = state = 'เพิ่มกระทรวง {} เสร็จสิ้น'.format(request.POST['add_ministry'])
+            state = 'เพิ่มกระทรวง {} เสร็จสิ้น'.format(request.POST['add_ministry'])
         elif 'select_province' in request.POST:
             Province.objects.filter(province=request.POST['select_province']).delete()
-            request.state = state = 'ลบจังหวัด {} เสร็จสิ้น'.format(request.POST['select_province'])
+            state = 'ลบจังหวัด {} เสร็จสิ้น'.format(request.POST['select_province'])
         elif 'select_ministry' in request.POST:
             Ministry.objects.filter(ministry=request.POST['select_ministry']).delete()
-            request.state = state = 'ลบกระทรวง {} เสร็จสิ้น'.format(request.POST['select_ministry'])
+            state = 'ลบกระทรวง {} เสร็จสิ้น'.format(request.POST['select_ministry'])
+        elif 'is_send' in request.POST:
+            form_configuration.sender_mail_status = not form_configuration.sender_mail_status
+            form_configuration.save()
+        elif 'is_delete' in request.POST:
+            form_configuration.delete_date_status = not form_configuration.delete_date_status
+            form_configuration.save()
         else:
             config = Configuration.objects.get(pk=1)
             config.send_mail_date = request.POST['send_mail_date']
@@ -191,7 +217,7 @@ def configuration(request):
             config.sender_mail = request.POST['sender_mail']
             config.save()
             state = 'เปลี่ยนการตั้งค่าเสร็จสิ้น'
-    context = {'form_configuration': form_configuration, 'province': province, 'ministry': ministry,'state':state}
+    context = {'form_configuration': form_configuration, 'province': province, 'ministry': ministry, 'state': state}
     return render(request, 'general_app/configuration.html', context)
 
 
@@ -219,8 +245,8 @@ def manage_user(request):
                 form_user_detail.save()
                 form_user_detail = User_DetailForm()
                 form_user_creation = UserCreationForm()
-                context = {'add_user': True, 'users': users,'form_user_creation': form_user_creation,
-                           'form_user_detail': form_user_detail,'username':request.POST['username']}
+                context = {'add_user': True, 'users': users, 'form_user_creation': form_user_creation,
+                           'form_user_detail': form_user_detail, 'username': request.POST['username']}
                 return render(request, 'general_app/manage_users.html', context)
             else:
                 form_user_creation = form_user_creation

@@ -8,35 +8,35 @@
         {% csrf_token %}
         <div class="container">
             <div class="m-3">
-                <label for="email_address" class="form-label">Email address</label>
+                <label for="email_address" class="form-label">อีเมล</label>
                 {{ form_auth.email.errors }}
                 {{ form_auth.email }}
             </div>
             <div class="m-3">
-                <label for="address" class="form-label">Address</label>
+                <label for="address" class="form-label">ที่อยู่</label>
                 {#            <textarea class="form-control" id="address" rows="3" id="address" placeholder="185/19  ขอนแก่น"></textarea>#}
                 {{ form_user.address.errors }}
                 {{ form_user.address }}
             </div>
             <div class="m-3">
-                <label for="province" class="form-label">Province</label>
+                <label for="province" class="form-label">จังหวัด</label>
                 {{ form_user.province.errors }}
                 {{ form_user.province }}
             </div>
             <div class="m-3">
-                <label for="ministry" class="form-label">Ministry</label>
+                <label for="ministry" class="form-label">กระทรวง</label>
                 {#            <input type="email" class="form-control" id="ministry" placeholder="กระทรวงสาธารณสุข">#}
                 {{ form_user.ministry.errors }}
                 {{ form_user.ministry }}
             </div>
             <div class="m-3">
-                <label for="code" class="form-label">Code</label>
+                <label for="code" class="form-label">รหัส</label>
                 {#            <input type="email" class="form-control" id="code" placeholder="1234567">#}
                 {{ form_user.code.errors }}
                 {{ form_user.code }}
             </div>
             <div class="m-3">
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary">บันทึก</button>
                 <a class='mx-3' href="{% url 'password_change' %}">เปลี่ยนรหัสผ่าน</a>
             </div>
         </div>

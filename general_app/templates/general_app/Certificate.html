@@ -1,8 +1,19 @@
 {% extends 'general_app/base.html' %}
 {% block title %}Certificate{% endblock %}
 {% block content %}
+    {% load static %}
+    {% load bootstrap_icons %}
+    {% csrf_token %}
+    <div class="dropup position-fixed bottom-0 end-0 rounded-circle mb-3 me-3" id="delete_btn" style="display: none">
+        <form action="{% url 'certificate' %}" method="POST">
+            {% csrf_token %}
+            <input style="display: none" id="delete_file_input" name="delete_file" value="">
+            <button type="submit" class="btn btn-danger btn-lg" name="delete_file" onclick="delete_btn()">
+                {% bs_icon 'trash' size='23' %}ลบไฟล์
+            </button>
+        </form>
 
-
+    </div>
 
     {% if upload == 'upload_completed' %}
         <script>
@@ -23,7 +34,7 @@
                 title: '<strong>{{ cert_file.name }}</strong> uploaded successfully'
 
             })
-            window.location.replace("{% url 'certificate' %}");
+            {#window.location.replace("{% url 'certificate' %}");#}
         </script>
     {% endif %}
     {% if login %}
@@ -124,7 +135,7 @@
                 </div>
                 <div class="p-2">
                     <input class="form-control form-control-lg " list="datalistOptions" id="exampleDataList"
-                           placeholder="Type to search..." required name="username">
+                           placeholder="ชื่อโรงพยาบาล" required name="username" >
                     <datalist id="datalistOptions">
                         {% for user in users %}
                             <option value="{{ user }}">
@@ -133,7 +144,8 @@
                 </div>
                 <div class="btn-group btn-group-lg p-2" role="group" aria-label="...">
                     <button type="submit" class="btn btn-outline-success " role="group" id="submit_file"
-                            name="submit_file"><strong>ยืนยัน</strong></button>
+                            name="submit_files"><strong>ยืนยัน</strong>
+                    </button>
                 </div>
             </div>
         </form>
@@ -141,33 +153,43 @@
 
 
     <div class="d-flex justify-content-center flex-wrap">
-        <div class="">
-            <div class="p-2 flex-grow-2 bd-highlight">
-                <table class="table table-lg table-hover ">
-                    <thead>
-                    <tr>
-                        <th scope="col">ลำดับที่</th>
-                        <th scope="col" style="text-align: center">ไฟล์</th>
-                        <th scope="col" style="text-align: center">วันที่</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <div class="container" onclick="location.href='{{ cert.cert.url }}';">
-                        {% for cert,cert_date in cert %}
-                            <tr>
-                                <th scope="row" style="text-align: center">{{ forloop.counter }}</th>
-                                <td style="text-align: center"><a href="{{ cert.cert.url }}"
-                                                                  target="_blank">{{ cert.cert }}</a></td>
+        <div class="p-2 flex-grow-2 bd-highlight">
+            <table class="table table-lg table-hover ">
+                <thead>
+                <tr>
+                    <th><input class="form-check-input" type="checkbox" value="" id="flexCheckIndeterminate"
+                               style="font-size:20px"></th>
+                    <th scope="col">ลำดับที่</th>
+                    {% if request.user.is_superuser %}
+                        <th scope="col">โรงพยาบาล</th>
+                    {% endif %}
+                    <th scope="col">ไฟล์</th>
+                    <th scope="col">วันที่</th>
+                </tr>
+                </thead>
+                <tbody>
+                <div class="container" onclick="location.href='{{ cert.cert.url }}';">
+                    {% for cert,cert_date in certs %}
+                        <tr>
+                            <td>
+                                <input class="form-check-input" type="checkbox" value="{{ cert.id }}" id="pass_id"
+                                       id="flexCheckIndeterminate" onclick="valueChange(this)" name="pass_id"
+                                       style="font-size:20px">{{ cert.id }}
+                            </td>
+                            <th scope="row">{{ forloop.counter }}</th>
+                            {% if request.user.is_superuser %}
+                                <td>{{ cert.hospital }}</td>
+                            {% endif %}
+                            <td><a href="{{ cert.cert.url }}"
+                                   target="_blank">{{ cert.cert }}</a></td>
 
-                                {#                                    <td>{{ cert.create_date|date:"D d M Y" }}</td>#}
-                                <td style="text-align: center">{{ cert_date }}</td>
-
-                            </tr>
-                        {% endfor %}
-                    </div>
-                    </tbody>
-                </table>
-            </div>
+                            {#                                    <td>{{ cert.create_date|date:"D d M Y" }}</td>#}
+                            <td>{{ cert_date }}</td>
+                        </tr>
+                    {% endfor %}
+                </div>
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -210,6 +232,29 @@
         </form>
 
     {% endif %}
+    <script src="{% static 'designer/js/jquery.cookie.js' %}"></script>
+    <script>
+        var val_arr = []
+        valueChange = function (item) {
+            if (val_arr.includes(item.value)) {
+                val_arr.splice(val_arr.indexOf(item.value), 1)
+            } else {
+                val_arr.push(item.value)
+            }
+            if (val_arr.length == 0) {
+                document.getElementById("delete_btn").style.display = "none"
+            } else {
+                document.getElementById("delete_btn").style.display = ""
+            }
+            console.log(val_arr)
+        }
+
+        function delete_btn() {
+            document.getElementById("delete_file_input").value = val_arr.toString();
+        }
+
+
+    </script>
 {% endblock %}
 
 

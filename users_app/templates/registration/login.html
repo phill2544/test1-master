@@ -1,88 +1,195 @@
-{% extends 'general_app/base.html' %}
-{% block title %}Login{% endblock %}
-{% block content %}
-    <div>
-        <form action="{% url 'login' %}" METHOD="post" style="margin:50px">
-            {% csrf_token %}
-            {% if messages %}
-                {% for message in messages %}
-                    <script>
-                        Swal.fire({
-                            title: 'รหัสผ่านผิด กรุณากรอกใหม่',
-                            {#text: 'กรุณากรอกผู้ใช้งานและรหัสผ่านให้ถูกต้อง ',#}
-                            text: '',
-                            icon: 'error',
-                            confirmButtonText: 'Cool',
-                            timer: 1500
-                        })
-                    </script>
-                {% endfor %}
-            {% endif %}
-            <div class="form-group">
-                {#            <label for="username" class="form-label">Email address</label>#}
-                <div class="form-floating">
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'main.css' %}"/>
+        <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/css/bootstrap-select.css"/>
+{#    <link type="text/css" href="@@path/vendor/sweetalert2/dist/sweetalert2.min.css" rel="stylesheet">#}
+    <title>Document | Certificate</title>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+{% if messages %}
+    {% for message in messages %}
+                <script>
+                    Swal.fire({
+                        title: 'รหัสผ่านผิด กรุณากรอกใหม่',
+                        text: 'กรุณากรอกผู้ใช้งานและรหัสผ่านให้ถูกต้อง ',
+                        text: '',
+                        icon: 'error',
+                        confirmButtonText: 'ปิด',
+                        timer: 1500
+                    })
+                </script>
+    {% endfor %}
+{% endif %}
 
+
+
+
+<div class="container-fluid h-100">
+    <div class="row">
+        <div class="col d-none d-md-flex"
+             style="background-color: #93AE99;height: 100vh;display: flex;align-items: center;justify-content: center;">
+            <img class="img-fluid" src="{% static 'general_app/2022-03-18-6-22-454373.png' %}" width="400px"
+                 height="400px">
+        </div>
+        <div class="col "
+             style="height: 100vh;display: flex;align-items:center;align-content: stretch;flex-wrap: wrap;flex-direction: column;">
+            <div class="text-center" style="margin-top: 100px; margin-bottom: 60px">
+                <p style="font-size: xxx-large">ศูนย์สนับสนุนบริการสุขภาพที่ 7</p>
+            </div>
+            <div class="form-outline w-50 mt-5">
+                <label class="form-label" for="username">ชื่อผู้ใช้งาน</label>
+                {#                <input type="email" id="form2Example1" class="form-control"/>#}
+                <form action="{% url 'login' %}" METHOD="post">
+                    {% csrf_token %}
                     <input    {% if messages %}
                         {% for message in messages %}
                             class="form-control is-invalid"
+                            value="{{ request.session.user.username }}"
                         {% endfor %}
                     {% else %}
                             class="form-control "
                     {% endif %} list="username_login" id="username"
-                            placeholder="Username" name="username" required value="{{ request.POST.username }}"
+                            placeholder="Username" name="username" required
                             autocomplete="off">
                     <datalist name="username_login" id="username_login">
                         {% for user in user %}
                             <option value="{{ user }}">{{ user }}</option>
                         {% endfor %}
                     </datalist>
-                    <label for=" floatingPassword">Username</label>
-                </div>
-
-                {#                <div class="form-floating">#}
-                {#                    <select class="form-select" name="username">#}
-                {#                        {% for user in user %}#}
-                {#                            <option value="{{ user }}">{{ user }}</option>#}
-                {#                        {% endfor %}#}
-                {#                    </select>#}
-                {#                    <label for="floatingSelect">Name</label>#}
-                {#                </div>#}
-                {##}
-                {#                <select name="username" class="form-select" aria-label="Default select example">#}
-                {#                    {% for user in user %}#}
-                {#                        <option value="{{ user }}">{{ user }}</option>#}
-                {#                    {% endfor %}#}
-                {#                </select>#}
-                {#                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone#}
-                {#                    else.</small>#}
-                {#            </div>#}
-                {#                    <div class="form-group">#}
-                {#                        <label for="password">Password</label>#}
-                {#                        <input type="password" class="form-control" id="password" placeholder="Password"#}
-                {#                               name="password">#}
-                {#                    </div>#}
-                {#                <label for="floatingPassword" class="form-label">Password</label>#}
-                <div class="form-floating">
-                    <input type="password" {% if messages %}
-                        {% for message in messages %}
-                           class="form-control is-invalid"
-                        {% endfor %}
-                    {% else %}
-                           class="form-control "
-                    {% endif %} id="floatingPassword"
-                           placeholder="Password"
-                           name="password" required>
-                    <label for="floatingPassword">Password</label>
-                </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-                {% if request.GET.next %}
-                    <input type="hidden" name="next" value="{{ request.GET.next }}">
-                {% endif %}
 
             </div>
-        </form>
+
+            <!-- Password input -->
+            <div class="form-outline mb-4 w-50">
+                <label class="form-label" for="floatingPassword">รหัสผ่าน</label>
+                {#                <input type="password" id="form2Example2" class="form-control"/>#}
+                <input type="password" {% if messages %}#}
+                    {% for message in messages %}
+                       class="form-control is-invalid"
+                    {% endfor %}
+                {% else %}
+                       class="form-control "
+                {% endif %} id="floatingPassword"
+                       placeholder="รหัสผ่าน"
+                       name="password" required>
+                {#                                    <label for="floatingPassword">รหัสผ่าน</label>#}
+
+            </div>
+
+            <!-- Submit button -->
+            <button type="submit" class="btn btn-primary btn-block mb-4">เข้าสู่ระบบ</button>
+
+            <!-- Register buttons -->
+            </form>
+        </div>
     </div>
+</div>
+
+</body>
+</html>
 
 
 
-{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+{#    <div>#}
+{#        <form action="{% url 'login' %}" METHOD="post" style="margin:50px">#}
+{#            {% csrf_token %}#}
+{#            {% if messages %}#}
+{#                {% for message in messages %}#}
+{#                    <script>#}
+{#                        Swal.fire({#}
+{#                            title: 'รหัสผ่านผิด กรุณากรอกใหม่',#}
+{#text: 'กรุณากรอกผู้ใช้งานและรหัสผ่านให้ถูกต้อง ',#}
+{#                            text: '',#}
+{#                            icon: 'error',#}
+{#                            confirmButtonText: 'Cool',#}
+{#                            timer: 1500#}
+{#                        })#}
+{#                    </script>#}
+{#                {% endfor %}#}
+{#            {% endif %}#}
+{#            <div class="form-group">#}
+{#            <label for="username" class="form-label">Email address</label>#}
+{#                <div class="form-floating">#}
+{##}
+{#                    <input    {% if messages %}#}
+{#                        {% for message in messages %}#}
+{#                            class="form-control is-invalid"#}
+{#                        {% endfor %}#}
+{#                    {% else %}#}
+{#                            class="form-control "#}
+{#                    {% endif %} list="username_login" id="username"#}
+{#                            placeholder="Username" name="username" required value="{{ request.POST.username }}"#}
+{#                            autocomplete="off">#}
+{#                    <datalist name="username_login" id="username_login">#}
+{#                        {% for user in user %}#}
+{#                            <option value="{{ user }}">{{ user }}</option>#}
+{#                        {% endfor %}#}
+{#                    </datalist>#}
+{#                    <label for=" floatingPassword">ชื่อผู้ใช้งาน</label>#}
+{#                </div>#}
+{##}
+{#                <div class="form-floating">#}
+{#                    <select class="form-select" name="username">#}
+{#                        {% for user in user %}#}
+{#                            <option value="{{ user }}">{{ user }}</option>#}
+{#                        {% endfor %}#}
+{#                    </select>#}
+{#                    <label for="floatingSelect">Name</label>#}
+{#                </div>#}
+{##}
+{#                <select name="username" class="form-select" aria-label="Default select example">#}
+{#                    {% for user in user %}#}
+{#                        <option value="{{ user }}">{{ user }}</option>#}
+{#                    {% endfor %}#}
+{#                </select>#}
+{#                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone#}
+{#                    else.</small>#}
+{#            </div>#}
+{#                    <div class="form-group">#}
+{#                        <label for="password">Password</label>#}
+{#                        <input type="password" class="form-control" id="password" placeholder="Password"#}
+{#                               name="password">#}
+{#                    </div>#}
+{#                <label for="floatingPassword" class="form-label">Password</label>#}
+{#                <div class="form-floating">#}
+{#                    <input type="password" {% if messages %}#}
+{#                        {% for message in messages %}#}
+{#                           class="form-control is-invalid"#}
+{#                        {% endfor %}#}
+{#                    {% else %}#}
+{#                           class="form-control "#}
+{#                    {% endif %} id="floatingPassword"#}
+{#                           placeholder="รหัสผ่าน"#}
+{#                           name="password" required>#}
+{#                    <label for="floatingPassword">รหัสผ่าน</label>#}
+{#                </div>#}
+{#                <button type="submit" class="btn btn-primary">Submit</button>#}
+{#                {% if request.GET.next %}#}
+{#                    <input type="hidden" name="next" value="{{ request.GET.next }}">#}
+{#                {% endif %}#}
+{##}
+{#            </div>#}
+{#        </form>#}
+{#    </div>#}
+{##}
+{##}
