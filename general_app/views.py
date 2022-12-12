@@ -2,6 +2,7 @@ import datetime
 import json
 from datetime import date
 from dateutil.relativedelta import relativedelta
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render
@@ -9,7 +10,7 @@ from django.http.response import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from .models import User_Detail, CertificateFile, Configuration, Province, Ministry
 from django.contrib.auth.models import User
-from .forms import User_DetailForm, UserProfileForm, UserCreationForm
+from .forms import User_DetailForm, UserProfileForm, UserCreationForm,CertificateForm
 from django.conf import settings
 import os
 from django.core.mail import send_mail
@@ -97,6 +98,10 @@ def send_email():
 
 @login_required
 def certificate(request):
+    try:
+        certform = CertificateForm(request.POST, request.FILES)
+    except:
+        certform = CertificateForm()
     cert = None
     email_authen = None
     email_valid = None
@@ -123,20 +128,23 @@ def certificate(request):
             if email_authen == email_valid:
                 user.email = email_authen
                 user.save()
+                messages.success(request,'email success')
             else:
+                messages.success(request, 'emails are not match')
                 return render(request, 'general_app/Certificate.html',
                               context={'email_authen': email_authen, 'email_valid': email_valid})
         elif request.FILES:
-            cert_file = request.FILES['cert_file']
-            hospital_id = User.objects.get(
-                username=request.POST['username']).id  # get is a object and filter is multi objects
-            CertificateFile.objects.create(cert=cert_file.name, hospital_id=hospital_id)
-            print(CertificateFile.cert)
-            fs = FileSystemStorage()
-            fs.save(cert_file.name, cert_file)
-            context = {'cert': CertificateFile.objects.filter(hospital_id=request.user.id),
-                       'upload': 'upload_completed', 'cert_file': cert_file, 'certs': zip(certs, cert_date)}
-            return render(request, 'general_app/Certificate.html', context)
+            if certform.is_valid():
+                certform.save()
+            # cert_file = request.FILES['cert_file']
+            # hospital_id = User.objects.get(
+            #     username=request.POST['username']).id  # get is a object and filter is multi objects
+            # CertificateFile.objects.create(cert=cert_file.name, hospital_id=hospital_id)
+            # fs = FileSystemStorage()
+            # fs.save(cert_file.name, cert_file)
+            # messages.success(request, 'uploaded file')
+            return HttpResponseRedirect(reverse('certificate'))
+            # return render(request, 'general_app/Certificate.html', context)
         elif 'delete_file' in request.POST:
             delete_files = str(request.POST)
             delete_files = delete_files[delete_files.index('delete_file') + 16:delete_files.index(']}>') - 5].split(',')
@@ -146,7 +154,7 @@ def certificate(request):
                 certificate_file.delete()
             return HttpResponseRedirect(reverse('certificate'))
     context = {'certs': zip(certs, cert_date), 'email_authen': email_authen, 'email_valid': email_valid,
-               'users': users, }
+               'users': users, 'certform':certform}
     return render(request, 'general_app/Certificate.html', context)
 
 
@@ -288,5 +296,4 @@ def edit_user(request, pk):
                                'form_user_email': None})
     context = {'detail_modal': True, 'users': users, 'form_user': form_user_detail, 'name': name,
                'form_user_email': form_user}
-    # return reverse('manage_user',kwargs={'pk':pk })
     return render(request, 'general_app/manage_users.html', context)

@@ -12,117 +12,120 @@
                 {% bs_icon 'trash' size='23' %}ลบไฟล์
             </button>
         </form>
-
     </div>
 
-    {% if upload == 'upload_completed' %}
-        <script>
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 2500,
-                timerProgressBar: false,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-            })
 
-            Toast.fire({
-                icon: 'success',
-                title: '<strong>{{ cert_file.name }}</strong> uploaded successfully'
+    {% for message in messages %}
+        {% if message.message == "uploaded file" %}
+            <script>
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2500,
+                    timerProgressBar: false,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                })
 
-            })
-            {#window.location.replace("{% url 'certificate' %}");#}
-        </script>
-    {% endif %}
-    {% if login %}
-        <script>
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 2500,
-                timerProgressBar: false,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-            })
+                Toast.fire({
+                    icon: 'success',
+                    title: 'อัพโหลดเสร็จเรียบร้อย'
 
-            Toast.fire({
-                icon: 'success',
-                title: '<strong>{{ user }}</strong> signed in successfully'
-            })
-        </script>
-    {% endif %}
+                })
+            </script>
+        {% elif message.message == 'login success' %}
+            <script>
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2500,
+                    timerProgressBar: false,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                })
 
-    {% if email_authen == email_valid and request.method == 'POST' and upload_completed == 'upload_completed' %}
-        <script>
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: false,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-            })
-
-            Toast.fire({
-                icon: 'success',
-                title: '<strong>{{ email_authen }}</strong> successfully'
-            })
-        </script>
-    {% endif %}
-
-    {% if email_authen != email_valid %}
-        <script>
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: false,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-            })
-
-            Toast.fire({
-                icon: 'success',
-                title: 'กรุณาตรวจสอบอีกเมล์อีกครั้งเพื่อความถูกต้อง'
-            })
-        </script>
-    {% endif %}
+                Toast.fire({
+                    icon: 'success',
+                    title: '<strong>{{ user }}</strong> เข้าสู่ระบบเรียบร้อยแล้ว'
+                })
+            </script>
 
 
-    {% if certificate_file %}
-        <script>
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: false,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-            })
+        {% elif message.message == 'email success' %}
+            <script>
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: false,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                })
 
-            Toast.fire({
-                icon: 'success',
-                title: '<strong>{{ certificate_file.cert }}</strong> uploaded successfully'
-            })
-        </script>
-    {% endif %}
+                Toast.fire({
+                    icon: 'success',
+                    title: 'เพิ่ม <strong>{{ email_authen }}</strong> เรียบร้อย'
+                })
+            </script>
 
 
+        {% elif message.message == 'emails are not match' %}
+            <script>
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: false,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                })
+
+                Toast.fire({
+                    icon: 'error',
+                    title: 'กรุณาตรวจสอบอีเมลอีกครั้งเพื่อความถูกต้อง'
+                })
+            </script>
+
+
+        {% elif certificate_file %}
+            <script>
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: false,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                })
+
+                Toast.fire({
+                    icon: 'success',
+                    title: '<strong>{{ certificate_file.cert }}</strong> uploaded successfully'
+                })
+            </script>
+        {% endif %}
+
+
+
+
+
+
+    {% endfor %}
 
     {#upload#}
     {% if request.user.is_superuser %}
@@ -130,19 +133,26 @@
               onsubmit="submit_file.disabled = true; return true;">
             {% csrf_token %}
             <div class="d-flex justify-content-center flex-wrap" style="margin-top: 50px">
-                <div class="p-2">
-                    <input class="form-control form-control-lg " type="file" required name="cert_file">
+                <div class="p-1">
+                    {{ certform.cert }}
+                    {#                    <input class="form-control form-control-lg " type="file" required name="cert_file">#}
                 </div>
-                <div class="p-2">
-                    <input class="form-control form-control-lg " list="datalistOptions" id="exampleDataList"
-                           placeholder="ชื่อโรงพยาบาล" required name="username" >
-                    <datalist id="datalistOptions">
+                <div class="p-1">
+                    {{ certform.hospital }}
+                    <datalist id="datalistOptions">#}
                         {% for user in users %}
                             <option value="{{ user }}">
                         {% endfor %}
                     </datalist>
+                    {#                    <input class="form-control form-control-lg " list="datalistOptions" id="exampleDataList"#}
+                    {#                           placeholder="ชื่อโรงพยาบาล" required name="username">#}
+                    {#                    <datalist id="datalistOptions">#}
+                    {#                        {% for user in users %}#}
+                    {#                            <option value="{{ user }}">#}
+                    {#                        {% endfor %}#}
+                    {#                    </datalist>#}
                 </div>
-                <div class="btn-group btn-group-lg p-2" role="group" aria-label="...">
+                <div class="btn-group btn-group-lg p-1" role="group" aria-label="...">
                     <button type="submit" class="btn btn-outline-success " role="group" id="submit_file"
                             name="submit_files"><strong>ยืนยัน</strong>
                     </button>
@@ -157,7 +167,7 @@
             <table class="table table-lg table-hover ">
                 <thead>
                 <tr>
-                    <th><input class="form-check-input" type="checkbox" value="" id="flexCheckIndeterminate"
+                    <th><input class="form-check-input" type="checkbox" value="" id="check_all" onclick="select_all()"
                                style="font-size:20px"></th>
                     <th scope="col">ลำดับที่</th>
                     {% if request.user.is_superuser %}
@@ -173,7 +183,7 @@
                         <tr>
                             <td>
                                 <input class="form-check-input" type="checkbox" value="{{ cert.id }}" id="pass_id"
-                                       id="flexCheckIndeterminate" onclick="valueChange(this)" name="pass_id"
+                                       onclick="valueChange(this)" name="pass_id"
                                        style="font-size:20px">{{ cert.id }}
                             </td>
                             <th scope="row">{{ forloop.counter }}</th>
@@ -206,19 +216,28 @@
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">E-mail</h5>
+                            <h5 class="modal-title" id="exampleModalLabel">เพิ่มอีเมล</h5>
                             <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"
                                     onclick="javascript:window.location.reload()">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">
-                            <input type="email" class="form-control" id="exampleInputEmail1"
-                                   aria-describedby="emailHelp"
-                                   placeholder="Enter email" name="email" required>
-                            <input type="email" name="email_valid" placeholder="Enter email again" class="form-control"
-                                   autocomplete="off">
-                            <small id="emailHelp" class="form-text text-muted">กรุณาใส่อีเมล์ที่สามารถใช้ได้จริงเพื่อทำการแจ้งเตือนนัดล่วงหน้า.</small>
+                            <div class="container">
+                                <label>
+                                    อีเมล
+                                </label>
+                                <input type="email" class="form-control mb-3" id="exampleInputEmail1"
+                                       aria-describedby="emailHelp"
+                                       placeholder="กรอกอีเมล" name="email" required
+                                       {% if email_authen %}value="{{ email_authen }} {% endif %}">
+                                <label>ยืนยันอีเมล</label>
+                                <input type="email" name="email_valid" placeholder="กรอกอีเมลอีกครั้ง"
+                                       class="form-control"
+                                       autocomplete="off">
+                                <small id="emailHelp" class="form-text text-muted">กรุณาใส่อีเมล์ที่สามารถใช้ได้จริงเพื่อทำการแจ้งเตือนนัดล่วงหน้า.</small>
+                            </div>
+
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger me-auto" data-bs-dismiss="modal"
@@ -249,10 +268,26 @@
             console.log(val_arr)
         }
 
+
         function delete_btn() {
             document.getElementById("delete_file_input").value = val_arr.toString();
         }
 
+        function select_all() {
+            var checkbox = document.getElementsByName('pass_id');
+            var check_all = document.getElementById('check_all')
+            if (check_all.checked == true) {
+                for (var count = 0; count <= checkbox.length; count++) {
+                    checkbox[count].checked = true;
+                    document.getElementById("delete_btn").style.display = ""
+                }
+            } else {
+                for (var count = 0; count <= checkbox.length; count++) {
+                    checkbox[count].checked = false;
+                    document.getElementById("delete_btn").style.display = "none"
+                }
+            }
+        }
 
     </script>
 {% endblock %}

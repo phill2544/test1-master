@@ -23,13 +23,14 @@ def login_user(request):
             user = authenticate(username=username, password=password)  # check user and password
             if user is not None:
                 if user.is_active:
+                    messages.success(request, 'login success')
                     login(request, user)
                     return redirect('certificate')
                     # return redirect('certificate')
                 # else:
                 #     return render(request, 'registration/login.html', context={'login': 'login'})
             else:
-                messages.success(request, ('Got something wrong'))
+                messages.success(request, 'Got something wrong')
                 request.session['user'] = {'username':request.POST['username']}
                 return redirect('login')
 

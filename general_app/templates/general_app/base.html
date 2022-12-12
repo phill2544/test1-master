@@ -11,7 +11,7 @@
     <!-- CSS only -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
-{#    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstraicons@1.8.1/font/bootstrap-icons.css">#}
+    {#    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstraicons@1.8.1/font/bootstrap-icons.css">#}
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/css/bootstrap-select.css"/>
     <link rel="stylesheet" href="{% static 'main.css' %}"/>
@@ -20,6 +20,45 @@
 </head>
 <body>
 <header>
+    {#    <nav class="navbar navbar-expand-md navbar-dark bg-dark">#}
+    {#    <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">#}
+    {#        <ul class="navbar-nav mr-auto">#}
+    {#            <li class="nav-item active">#}
+    {#                <a class="nav-link" href="#">Left</a>#}
+    {#            </li>#}
+    {#            <li class="nav-item">#}
+    {#                <a class="nav-link" href="//codeply.com">Codeply</a>#}
+    {#            </li>#}
+    {#            <li class="nav-item">#}
+    {#                <a class="nav-link" href="#">Link</a>#}
+    {#            </li>#}
+    {#            <li class="nav-item">#}
+    {#                <a class="nav-link" href="#">Link</a>#}
+    {#            </li>#}
+    {#            <li class="nav-item">#}
+    {#                <a class="nav-link" href="#">Link</a>#}
+    {#            </li>#}
+    {#        </ul>#}
+    {#    </div>#}
+    {#    <div class="mx-auto order-0">#}
+    {#        <a class="navbar-brand mx-auto" href="#">Navbar 2</a>#}
+    {#        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2">#}
+    {#            <span class="navbar-toggler-icon"></span>#}
+    {#        </button>#}
+    {#    </div>#}
+    {#    <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">#}
+    {#        <ul class="navbar-nav ml-auto">#}
+    {#            <li class="nav-item">#}
+    {#                <a class="nav-link" href="#">Right</a>#}
+    {#            </li>#}
+    {#            <li class="nav-item">#}
+    {#                <a class="nav-link" href="#">Link</a>#}
+    {#            </li>#}
+    {#        </ul>#}
+    {#    </div>#}
+    {#</nav>#}
+
+
     <nav class="navbar navbar-expand-md navbar-dark bg-success">
         <div class="container-fluid ">
             <a class="navbar-brand" href="{% url 'certificate' %}" style="margin-left:10px">
@@ -31,7 +70,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav mr-auto">
+                <ul class="navbar-nav ">
                     <li class="nav-item active">
                         <a class="nav-link " href="{% url 'certificate' %}" id="btn_home">
                             {% bs_icon 'folder2-open' size='23' %} หน้าแรก</a>
@@ -46,8 +85,12 @@
                                href="{% url 'configuration' %}">{% bs_icon 'gear' size='23' %}ตั้งค่า<span
                                     class="sr-only"></span></a>
                         </li>
-
                     {% endif %}
+                </ul>
+                <ul class="navbar-nav ms-auto w-50">
+                        <input class="form-control me-2" type="search" placeholder="Search"
+                               aria-label="Search">
+                        <button class="btn btn-outline-light" type="submit">Search</button>
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
@@ -58,7 +101,8 @@
                                     class="sr-only"></span></a>
                         </li>
                         <li class="nav-item active">
-                            <a class="nav-link" href="{% url 'logout' %}">{% bs_icon 'door-open' size='23' %}ออกจากระบบ<span
+                            <a class="nav-link"
+                               href="{% url 'logout' %}">{% bs_icon 'door-open' size='23' %}ออกจากระบบ<span
                                     class="sr-only"></span></a>
                         </li>
                     {% endif %}

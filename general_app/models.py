@@ -6,7 +6,7 @@ from django.contrib.auth.models import AbstractUser, User
 
 # Create your models here
 class CertificateFile(models.Model):
-    cert = models.FileField(upload_to='Document%Y')
+    cert = models.FileField(upload_to='%Y/')
     hospital = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=False)
     create_date = models.DateField(auto_now_add=True, null=False)
 

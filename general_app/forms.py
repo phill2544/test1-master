@@ -10,19 +10,14 @@ class User_DetailForm(forms.ModelForm):
         fields = ('address', 'province', 'ministry', 'code', 'cal_date')
         widgets = {
             'address': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'ที่อยู่', 'rows': '3'}),
-            'province': forms.Select(attrs={'class': 'form-control','placeholder': 'ขอนแก่น'}),
-            'ministry': forms.Select(attrs={'class': 'form-control','placeholder': 'ขอนแก่น'}),
+            'province': forms.Select(attrs={'class': 'form-control', 'placeholder': 'ขอนแก่น'}),
+            'ministry': forms.Select(attrs={'class': 'form-control', 'placeholder': 'ขอนแก่น'}),
             'code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '1234567'}),
             'cal_date': forms.DateInput(format=('%Y-%m-%d'),
                                         attrs={'class': 'form-control', 'placeholder': 'Select Date', 'type': 'date',
                                                'onfocus': 'this.showPicker()', }),
 
         }
-    # user = models.OneToOneField(User, on_delete=models.CASCADE)
-    # address = models.TextField(null=True,)
-    # province = models.CharField(max_length=60, null=True, default='test')
-    # ministry = models.CharField(max_length=60, null=True, default='test')
-    # code = models.CharField(max_length=7, null=True, default='test')
 
 
 class UserProfileForm(forms.ModelForm):
@@ -50,4 +45,15 @@ class UserCreationForm(forms.ModelForm):
                 ('0', 'User'),
                 ('1', 'Admin'),
             ), attrs={'class': 'form-control', 'placeholder': 'Permission'}),
+        }
+
+
+class CertificateForm(forms.ModelForm):
+    class Meta:
+        model = CertificateFile
+        fields = ('cert', 'hospital')
+        widgets = {
+            'cert': forms.FileInput(attrs={'class': 'form-control form-control-lg'}),
+            'hospital': forms.CheckboxInput(attrs={'class': 'form-control form-control-lg', 'list': 'datalistOptions',
+                                            'placeholder': "ชื่อโรงพยาบาล",'type':'text'})
         }
