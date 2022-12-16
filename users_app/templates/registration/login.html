@@ -8,25 +8,25 @@
           integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
     {% load static %}
     <link rel="stylesheet" href="{% static 'main.css' %}"/>
-        <link rel="stylesheet"
+    <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/css/bootstrap-select.css"/>
-{#    <link type="text/css" href="@@path/vendor/sweetalert2/dist/sweetalert2.min.css" rel="stylesheet">#}
+    {#    <link type="text/css" href="@@path/vendor/sweetalert2/dist/sweetalert2.min.css" rel="stylesheet">#}
     <title>Document | Certificate</title>
-<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 {% if messages %}
     {% for message in messages %}
-                <script>
-                    Swal.fire({
-                        title: 'รหัสผ่านผิด กรุณากรอกใหม่',
-                        text: 'กรุณากรอกผู้ใช้งานและรหัสผ่านให้ถูกต้อง ',
-                        text: '',
-                        icon: 'error',
-                        confirmButtonText: 'ปิด',
-                        timer: 1500
-                    })
-                </script>
+        <script>
+            Swal.fire({
+                title: 'รหัสผ่านผิด กรุณากรอกใหม่',
+                text: 'กรุณากรอกผู้ใช้งานและรหัสผ่านให้ถูกต้อง ',
+                text: '',
+                icon: 'error',
+                confirmButtonText: 'ปิด',
+                timer: 1500
+            })
+        </script>
     {% endfor %}
 {% endif %}
 
@@ -36,19 +36,24 @@
 <div class="container-fluid h-100">
     <div class="row">
         <div class="col d-none d-md-flex"
-             style="background-color: #93AE99;height: 100vh;display: flex;align-items: center;justify-content: center;">
+             style="background-color: #93AE99;height: 100vh;display: flex;align-items: center;justify-content: center;flex-direction: column">
             <img class="img-fluid" src="{% static 'general_app/2022-03-18-6-22-454373.png' %}" width="400px"
                  height="400px">
+            <H1 class="mt-5">กรมสนับสนุนบริการสุขภาพ</H1>
+
+
         </div>
         <div class="col "
              style="height: 100vh;display: flex;align-items:center;align-content: stretch;flex-wrap: wrap;flex-direction: column;">
             <div class="text-center" style="margin-top: 100px; margin-bottom: 60px">
                 <p style="font-size: xxx-large">ศูนย์สนับสนุนบริการสุขภาพที่ 7</p>
             </div>
+
             <div class="form-outline w-50 mt-5">
-                <label class="form-label" for="username">ชื่อผู้ใช้งาน</label>
-                {#                <input type="email" id="form2Example1" class="form-control"/>#}
                 <form action="{% url 'login' %}" METHOD="post">
+                    <label class="form-label" for="username" style="font-size: 18px">ชื่อผู้ใช้งาน</label>
+                    {#                <input type="email" id="form2Example1" class="form-control"/>#}
+
                     {% csrf_token %}
                     <input    {% if messages %}
                         {% for message in messages %}
@@ -65,19 +70,18 @@
                             <option value="{{ user }}">{{ user }}</option>
                         {% endfor %}
                     </datalist>
-
             </div>
 
             <!-- Password input -->
-            <div class="form-outline mb-4 w-50">
-                <label class="form-label" for="floatingPassword">รหัสผ่าน</label>
+            <div class="form-outline mb-6 w-50">
+                <label class="form-label" for="floatingPassword" style="font-size: 18px">รหัสผ่าน</label>
                 {#                <input type="password" id="form2Example2" class="form-control"/>#}
                 <input type="password" {% if messages %}#}
                     {% for message in messages %}
                        class="form-control is-invalid"
                     {% endfor %}
                 {% else %}
-                       class="form-control "
+                       class="form-control"
                 {% endif %} id="floatingPassword"
                        placeholder="รหัสผ่าน"
                        name="password" required>
@@ -86,7 +90,7 @@
             </div>
 
             <!-- Submit button -->
-            <button type="submit" class="btn btn-primary btn-block mb-4">เข้าสู่ระบบ</button>
+            <button type="submit" class="btn btn-primary btn-block mt-5">เข้าสู่ระบบ</button>
 
             <!-- Register buttons -->
             </form>
@@ -96,18 +100,6 @@
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 {#    <div>#}

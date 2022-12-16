@@ -4,8 +4,8 @@
     {% load bootstrap_icons %}
     <div class="dropup position-fixed bottom-0 end-0 rounded-circle mb-3 me-3">
         <button type="button" class="btn btn-success btn-lg" name="add_user" data-bs-toggle="modal"
-        {#                    data-bs-target="#add_user">
-           {% bs_icon 'person-plus' size='23' %}เพิ่มผู้ใช้งาน
+                {# data-bs-target="#add_user">
+            {% bs_icon 'person-plus' size='23' %}เพิ่มผู้ใช้งาน
         </button>
     </div>
 
@@ -73,7 +73,21 @@
                                     data-bs-target="#detail">
                                 รายละเอียด
                             </button>
+
                         </td>
+                        <td>
+                            <form action="{% url 'edit_user' user.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger" data-bs-toggle="modal"
+                                        data-bs-target="#detail" name="delete_user"
+{#                                        onclick="location.href='{% url 'edit_user' user.id %}';" name="delete_user"#}
+                                >
+                                    {% bs_icon 'trash' size='23' %}{{ user.id }}
+                                </button>
+                            </form>
+
+                        </td>
+
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -83,6 +97,8 @@
     </div>
 
 
+
+{#    edit_user#}
     {% if detail_modal %}
         <form method="post" action="{% url 'edit_user' name.user_id %}">
             {% csrf_token %}
@@ -103,7 +119,7 @@
                                     {{ form_user.address }}
                                     {{ form_user.address.errors }}
                                 </div>
-                                <div>
+                                <div class="mt-3">
                                     <label class="form-label">อีเมล</label>
                                     {{ form_user_email.email }}
                                     {{ form_user_email.email.errors }}
@@ -112,22 +128,22 @@
                                     {{ form_user_email.username }}
                                     {{ form_user_email.username.errors }}
                                 </div>
-                                <div>
-                                    <label class="form-label">รหัส</label>
-                                    {{ form_user.code }}
-                                    {{ form_user.code.errors }}
-                                </div>
-                                <div>
+                                <div class="mt-3">
                                     <label class="form-label">จังหวัด</label>
                                     {{ form_user.province }}
                                     {{ form_user.province.errors }}
                                 </div>
-                                <div>
+                                <div class="mt-3">
                                     <label class="form-label">กระทรวง</label>
                                     {{ form_user.ministry }}
                                     {{ form_user.ministry.errors }}
                                 </div>
-                                <div>
+                                <div class="mt-3">
+                                    <label class="form-label">รหัส</label>
+                                    {{ form_user.code }}
+                                    {{ form_user.code.errors }}
+                                </div>
+                                <div class="mt-3">
                                     <label class="form-label">วันที่เรียก</label>
                                     {{ form_user.cal_date }}
                                     {{ form_user.cal_date.errors }}
@@ -258,7 +274,7 @@
                         <div class="tab-content" id="myTabContent">
                             <div class="tab-pane fade show active mt-2" id="home-tab-pane" role="tabpanel"
                                  aria-labelledby="home-tab" tabindex="0">
-                                <div>
+                                <div class="mt-3">
                                     <label class="form-label">ชื่อผู้ใช้งาน</label>
                                     {% if exist_user %}
                                         {{ form_user_creation.username }}
@@ -267,26 +283,26 @@
                                         {{ form_user_creation.username }}
                                     {% endif %}
                                 </div>
-                                <div>
+                                <div class="mt-3">
                                     <label class="form-label">รหัสผ่าน</label>
                                     {{ form_user_creation.password }}
                                     {{ form_user_creation.password.errors }}
                                     <p id='message_password' class="mb-0"></p>
                                     <input type="checkbox" onclick="show_password1()" class="my-2">แสดงรหัสผ่าน
                                 </div>
-                                <div>
+                                <div class="mt-3">
                                     <label class="form-label">ยืนยันรหัสผ่าน</label>
                                     <input class="form-control" name="confirm_password" id="confirm_password"
                                            placeholder="Confirm Password" required
                                            type="password">
                                     <span id='message'></span>
                                 </div>
-                                <div>
+                                <div class="mt-3">
                                     <label class="form-label">บทบาท</label>
                                     {{ form_user_creation.is_superuser }}
                                     {{ form_user_creation.is_superuser.errors }}
                                 </div>
-                                <div>
+                                <div class="mt-3">
                                     <label class="form-label">วันที่เรียก</label>
                                     {{ form_user_detail.cal_date }}
                                     {{ form_user_detail.cal_date.errors }}
@@ -295,27 +311,27 @@
                             <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel"
                                  aria-labelledby="profile-tab"
                                  tabindex="0">
-                                <div>
+                                <div class="mt-3">
                                     <label class="form-label">อีเมล</label>
                                     {{ form_user_creation.email }}
                                     {{ form_user_creation.email.errors }}
                                 </div>
-                                <div>
+                                <div class="mt-3">
                                     <label class="form-label">จังหวัด</label>
                                     {{ form_user_detail.province }}
                                     {{ form_user_detail.province.errors }}
                                 </div>
-                                <div>
+                                <div class="mt-3">
                                     <label class="form-label">ที่อยู่</label>
                                     {{ form_user_detail.address }}
                                     {{ form_user_detail.address.errors }}
                                 </div>
-                                <div>
+                                <div class="mt-3">
                                     <label class="form-label">กระทรวง</label>
                                     {{ form_user_detail.ministry }}
                                     {{ form_user_detail.ministry.errors }}
                                 </div>
-                                <div>
+                                <div class="mt-3">
                                     <label class="form-label">รหัสโรงพยาบาล</label>
                                     {{ form_user_detail.code }}
                                     {{ form_user_detail.code.errors }}

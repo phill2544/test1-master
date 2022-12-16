@@ -18,6 +18,7 @@ class CertificateFile(models.Model):
         return self.hospital.user.username
 
 
+
 class Configuration(models.Model):
     delete_date = models.IntegerField(default=3)
     send_mail_date = models.IntegerField(default=-2)

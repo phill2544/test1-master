@@ -25,7 +25,7 @@ def login_user(request):
                 if user.is_active:
                     messages.success(request, 'login success')
                     login(request, user)
-                    return redirect('certificate')
+                    return redirect('home')
                     # return redirect('certificate')
                 # else:
                 #     return render(request, 'registration/login.html', context={'login': 'login'})
@@ -35,5 +35,5 @@ def login_user(request):
                 return redirect('login')
 
     else:  # logged in
-        return HttpResponseRedirect(reverse('certificate'))
+        return HttpResponseRedirect(reverse('home'))
     return render(request, 'registration/login.html', context={'user': User.objects.all()})

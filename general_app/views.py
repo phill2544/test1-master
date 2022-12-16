@@ -10,10 +10,17 @@ from django.http.response import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from .models import User_Detail, CertificateFile, Configuration, Province, Ministry
 from django.contrib.auth.models import User
-from .forms import User_DetailForm, UserProfileForm, UserCreationForm,CertificateForm
+from .forms import User_DetailForm, UserProfileForm, UserCreationForm, CertificateForm
 from django.conf import settings
 import os
 from django.core.mail import send_mail
+
+
+
+
+
+
+
 
 
 def month(month):
@@ -42,6 +49,12 @@ def month(month):
     else:
         return "ธันวาคม"
 
+def date_th(result):
+    cert_date = []
+    for result_date in result:
+        cert_date.append('{} {} {}'.format(result_date.create_date.day, month(result_date.create_date.month),
+                                           result_date.create_date.year + 543))
+    return cert_date;
 
 def delete_file():
     if Configuration.objects.get(pk=1).delete_date_status:
@@ -97,16 +110,78 @@ def send_email():
 
 
 @login_required
-def certificate(request):
+def home(request):
     try:
         certform = CertificateForm(request.POST, request.FILES)
     except:
         certform = CertificateForm()
-    cert = None
     email_authen = None
     email_valid = None
     cert_date = []
     user = User.objects.get(id=request.user.id)
+    if request.method == 'POST':
+        if 'email' in request.POST:
+            email_authen = request.POST['email']
+            email_valid = request.POST['email_valid']
+            if email_authen == email_valid:
+                user.email = email_authen
+                user.save()
+                messages.success(request, 'email success')
+            else:
+                messages.success(request, 'emails are not match')
+                return render(request, 'general_app/home.html',
+                              context={'email_authen': email_authen, 'email_valid': email_valid})
+        elif request.FILES:
+            if certform.is_valid():
+                certform.save()
+                # instance = certform.save(commit=False)
+                # instance.hospital_id = User.objects.get(username=request.POST['username']).id  # get is a object and filter is multi objects
+                # instance.save()
+                # hospital_id = User.objects.get(
+                #     username=request.POST['hospital']).id  # get is a object and filter is multi objects
+                # CertificateFile.objects.create(cert=certform.cleaned_data['cert'].name, hospital_id=hospital_id)
+            # cert_file = request.FILES['cert_file']
+            # hospital_id = User.objects.get(
+            #     username=request.POST['username']).id  # get is a object and filter is multi objects
+            # CertificateFile.objects.create(cert=cert_file.name, hospital_id=hospital_id)
+            # fs = FileSystemStorage()
+            # fs.save(cert_file.name, cert_file)
+            # messages.success(request, 'uploaded file')
+            return HttpResponseRedirect(reverse('home'))
+            # return render(request, 'general_app/home.html', context)
+        elif 'delete_file' in request.POST:
+            delete_files = str(request.POST)
+            delete_files = delete_files[delete_files.index('delete_file') + 16:delete_files.index(']}>') - 5].split(',')
+            for delete_file in delete_files:
+                certificate_file = CertificateFile.objects.get(pk=delete_file)
+                os.remove(certificate_file.cert.path)
+                certificate_file.delete()
+            return HttpResponseRedirect(reverse('home'))
+        # elif 'btn_sort' in request.POST:
+        #     pass
+            # return render(request, 'general_app/home.html',
+            #               {'certs': zip(result, cert_date), 'certform': certform})
+
+    elif 'searched' in request.GET and request.GET['searched'] is not '':
+        searched = request.GET['searched']
+        try:
+            result = CertificateFile.objects.filter(create_date__year=int(searched) - 543)
+        except:
+            try:
+                username_id = User.objects.get(username__contains=searched).id
+                result = CertificateFile.objects.filter(hospital_id=username_id)
+            except:
+                username_id = User.objects.filter(username__contains=searched)
+                result = CertificateFile.objects.filter(hospital_id__in=username_id)
+        cert_date = date_th(result)
+        return render(request, 'general_app/home.html',
+                      {'searched': searched, 'certs': zip(result, cert_date), 'certform': certform})
+    elif 'date_filter' in request.GET:
+        date_filter = request.GET['date_filter'].split('-')
+        result = CertificateFile.objects.filter(create_date__month=date_filter[1], create_date__year=date_filter[0])
+        cert_date = date_th(result)
+        return render(request, 'general_app/home.html',
+                      {'certs': zip(result, cert_date), 'certform': certform})
     if request.user.is_authenticated:
         try:
             users = User.objects.all()
@@ -117,45 +192,11 @@ def certificate(request):
             # date_th(cert)
         except:
             certs = CertificateFile.objects.filter()
-    for certi in certs:
-        cert_date.append('{} {} {}'.format(certi.create_date.day, month(certi.create_date.month),
-                                           certi.create_date.year + 543))
+    cert_date = date_th(certs)
 
-    if request.method == 'POST':
-        if 'email' in request.POST:
-            email_authen = request.POST['email']
-            email_valid = request.POST['email_valid']
-            if email_authen == email_valid:
-                user.email = email_authen
-                user.save()
-                messages.success(request,'email success')
-            else:
-                messages.success(request, 'emails are not match')
-                return render(request, 'general_app/Certificate.html',
-                              context={'email_authen': email_authen, 'email_valid': email_valid})
-        elif request.FILES:
-            if certform.is_valid():
-                certform.save()
-            # cert_file = request.FILES['cert_file']
-            # hospital_id = User.objects.get(
-            #     username=request.POST['username']).id  # get is a object and filter is multi objects
-            # CertificateFile.objects.create(cert=cert_file.name, hospital_id=hospital_id)
-            # fs = FileSystemStorage()
-            # fs.save(cert_file.name, cert_file)
-            # messages.success(request, 'uploaded file')
-            return HttpResponseRedirect(reverse('certificate'))
-            # return render(request, 'general_app/Certificate.html', context)
-        elif 'delete_file' in request.POST:
-            delete_files = str(request.POST)
-            delete_files = delete_files[delete_files.index('delete_file') + 16:delete_files.index(']}>') - 5].split(',')
-            for delete_file in delete_files:
-                certificate_file = CertificateFile.objects.get(pk=delete_file)
-                os.remove(certificate_file.cert.path)
-                certificate_file.delete()
-            return HttpResponseRedirect(reverse('certificate'))
     context = {'certs': zip(certs, cert_date), 'email_authen': email_authen, 'email_valid': email_valid,
-               'users': users, 'certform':certform}
-    return render(request, 'general_app/Certificate.html', context)
+               'users': users, 'certform': certform}
+    return render(request, 'general_app/home.html', context)
 
 
 @login_required
@@ -278,15 +319,26 @@ def manage_user(request):
 @login_required
 def edit_user(request, pk):
     users = User.objects.all()
-    name = User_Detail.objects.get(user_id=pk)
+    try:
+        name = User_Detail.objects.get(user_id=pk)
+    except:
+        pass
     if request.method == 'POST':
-        form_user_detail = User_DetailForm(request.POST, instance=User_Detail.objects.get(user_id=name.user_id))
-        form_user = UserProfileForm(request.POST, instance=User.objects.get(id=name.user_id))
-        if form_user_detail.is_valid() and form_user.is_valid():
-            form_user.save()
-            form_user_detail.save()
-            return HttpResponseRedirect(reverse('manage_user'))
-            # return HttpResponseRedirect(reverse('manage_user'))
+        if 'delete_user' in request.POST:
+            try:
+                User.objects.get(id=pk).delete()
+                return HttpResponseRedirect(reverse('manage_user'))
+            except User.DoesNotExist:
+                messages.error(request, 'User does not exist')
+                return HttpResponseRedirect(reverse('manage_user'))
+        else:
+            form_user_detail = User_DetailForm(request.POST, instance=User_Detail.objects.get(user_id=name.user_id))
+            form_user = UserProfileForm(request.POST, instance=User.objects.get(id=name.user_id))
+            if form_user_detail.is_valid() and form_user.is_valid():
+                form_user.save()
+                form_user_detail.save()
+                return HttpResponseRedirect(reverse('manage_user'))
+                # return HttpResponseRedirect(reverse('manage_user'))
     try:
         form_user_detail = User_DetailForm(instance=User_Detail.objects.get(user_id=pk))
         form_user = UserProfileForm(instance=User.objects.get(id=pk))
@@ -297,3 +349,7 @@ def edit_user(request, pk):
     context = {'detail_modal': True, 'users': users, 'form_user': form_user_detail, 'name': name,
                'form_user_email': form_user}
     return render(request, 'general_app/manage_users.html', context)
+
+
+
+

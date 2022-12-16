@@ -54,6 +54,6 @@ class CertificateForm(forms.ModelForm):
         fields = ('cert', 'hospital')
         widgets = {
             'cert': forms.FileInput(attrs={'class': 'form-control form-control-lg'}),
-            'hospital': forms.CheckboxInput(attrs={'class': 'form-control form-control-lg', 'list': 'datalistOptions',
-                                            'placeholder': "ชื่อโรงพยาบาล",'type':'text'})
+            'hospital': forms.Select(attrs={'class': 'form-control form-control-lg', 'list': 'datalistOptions',
+                                            'placeholder': "ชื่อโรงพยาบาล", 'type': 'text', 'id': 'datalist_input'})
         }

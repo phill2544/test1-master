@@ -9,12 +9,16 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{% block title %}{% endblock %} | Certificate</title>
     <!-- CSS only -->
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
     {#    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstraicons@1.8.1/font/bootstrap-icons.css">#}
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/css/bootstrap-select.css"/>
     <link rel="stylesheet" href="{% static 'main.css' %}"/>
+
+
+
 
 
 </head>
@@ -61,7 +65,7 @@
 
     <nav class="navbar navbar-expand-md navbar-dark bg-success">
         <div class="container-fluid ">
-            <a class="navbar-brand" href="{% url 'certificate' %}" style="margin-left:10px">
+            <a class="navbar-brand" href="{% url 'home' %}" style="margin-left:10px">
                 <img src="{% static 'general_app/2022-03-18-6-22-454373.png' %}" width="55" height="55">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -72,36 +76,32 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ">
                     <li class="nav-item active">
-                        <a class="nav-link " href="{% url 'certificate' %}" id="btn_home">
+                        <a class="nav-link " href="{% url 'home' %}" id="btn_home" style="font-size: 18px">
                             {% bs_icon 'folder2-open' size='23' %} หน้าแรก</a>
                     </li>
                     {% if request.user.is_superuser %}
                         <li class="nav-item active">
-                            <a class="nav-link" href="{% url 'manage_user' %}">{% bs_icon 'person-gear' size='23' %}จัดการผู้ใช้งาน
-                                <span class="sr-only"></span></a>
+                            <a class="nav-link" href="{% url 'manage_user' %}">{% bs_icon 'person-gear' size='23' %}
+                                <span class="sr-only" style="font-size: 18px">จัดการผู้ใช้งาน</span></a>
                         </li>
                         <li class="nav-item active">
-                            <a class="nav-link"
+                            <a class="nav-link" style="font-size: 18px"
                                href="{% url 'configuration' %}">{% bs_icon 'gear' size='23' %}ตั้งค่า<span
                                     class="sr-only"></span></a>
                         </li>
                     {% endif %}
                 </ul>
-                <ul class="navbar-nav ms-auto w-50">
-                        <input class="form-control me-2" type="search" placeholder="Search"
-                               aria-label="Search">
-                        <button class="btn btn-outline-light" type="submit">Search</button>
-                </ul>
+
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
                         <li class="nav-item active">
-                            <a class="nav-link" href=" {% url 'profile' %}">
+                            <a class="nav-link" href=" {% url 'profile' %}" style="font-size: 18px">
                                 {% bs_icon 'person-circle' size='23' %}
                                 </i>{{ user.username }}<span
                                     class="sr-only"></span></a>
                         </li>
                         <li class="nav-item active">
-                            <a class="nav-link"
+                            <a class="nav-link" style="font-size: 18px"
                                href="{% url 'logout' %}">{% bs_icon 'door-open' size='23' %}ออกจากระบบ<span
                                     class="sr-only"></span></a>
                         </li>
