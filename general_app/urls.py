@@ -13,6 +13,7 @@ urlpatterns = [
     path('configuration/', views.configuration, name='configuration'),
     path('Manage_users/', views.manage_user, name='manage_user'),
     path('Manage_users/<int:pk>/', views.edit_user, name='edit_user'),
+    path('home/pdf/',views.generate_pdf, name='pdf')
 
 ]
 

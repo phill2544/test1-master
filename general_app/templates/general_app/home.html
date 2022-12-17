@@ -138,17 +138,21 @@
                         <option value="{{ user }}"></option>
                     {% endfor %}
                 </datalist>
+                <input type="month" name="date_filter" class="ms-2">
                 <button type="submit" class="mx-2 btn btn-outline-success btn-lg">
                     {% bs_icon 'search' %}
                 </button>
 
-                <button type="button" class="btn btn-outline-secondary " role="group" data-bs-toggle="modal"
-                        data-bs-target="#filter"
-                >{% bs_icon 'filter' size='23' %}
-                </button>
-{#                <button type="submit" class="btn btn-outline-secondary ms-2" name="btn_sort">#}
-{#                    {% bs_icon 'sort-numeric-up-alt' size='23' %}#}
+            <a href="{% url 'pdf' %}" >PDF</a>
+{#                <button type="button" class="btn btn-outline-secondary " role="group" data-bs-toggle="modal"#}
+{#                        data-bs-target="#filter"#}
+{#                >{% bs_icon 'filter' size='23' %}#}
 {#                </button>#}
+
+
+                {#                <button type="submit" class="btn btn-outline-secondary ms-2" name="btn_sort">#}
+                {#                    {% bs_icon 'sort-numeric-up-alt' size='23' %}#}
+                {#                </button>#}
             </div>
         </form>
 
@@ -192,8 +196,8 @@
 
 
     <div class="d-flex justify-content-center flex-wrap ">
-        <div class="p-2 flex-grow-2 bd-highlight w-75">
-            <table class="table table-lg table-hover">
+        <div class="p-2 flex-grow-2 bd-highlight w-75 table-responsive">
+            <table class="table table-lg table-hover ">
                 <thead>
                 <tr>
                     <th scope="col">ลำดับที่</th>
@@ -286,7 +290,6 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <input type="month" name="date_filter">
                         <br>
                         เดือน
                         <input>

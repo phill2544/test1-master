@@ -1,6 +1,9 @@
 import datetime
 import json
 from datetime import date
+from xhtml2pdf import pisa
+from io import BytesIO
+from PyPDF3.pdf import BytesIO
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -14,14 +17,16 @@ from .forms import User_DetailForm, UserProfileForm, UserCreationForm, Certifica
 from django.conf import settings
 import os
 from django.core.mail import send_mail
+from django.http import FileResponse
+import io
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import Table
+from reportlab.platypus import SimpleDocTemplate
 
-
-
-
-
-
-
-
+from django.views.generic import View
+from django.template.loader import get_template
 
 def month(month):
     if month == 1:
@@ -49,12 +54,14 @@ def month(month):
     else:
         return "ธันวาคม"
 
+
 def date_th(result):
     cert_date = []
     for result_date in result:
         cert_date.append('{} {} {}'.format(result_date.create_date.day, month(result_date.create_date.month),
                                            result_date.create_date.year + 543))
     return cert_date;
+
 
 def delete_file():
     if Configuration.objects.get(pk=1).delete_date_status:
@@ -109,6 +116,57 @@ def send_email():
     pass
 
 
+
+
+# def generate_pdf(requset):
+#     data = {'user': User.objects.all()}
+#     template = get_template('general_app/uploaded_pdf.html')
+#     print(data['user'])
+#     print()
+#     data_p = template.render(data)
+#     response = BytesIO()
+#     # pdf = pisa.pisaDocument(BytesIO(data_p.encode("UTF-8")), response)
+#     pdf = pisa.pisaDocument(BytesIO(data_p.encode("UTF-8")), response)
+#     # pdf = pisa.pisaDocument(data_p, response)
+#     if not pdf.err:
+#         return HttpResponse(response.getvalue(), content_type='application/pdf')
+#     return None
+
+# def generate_pdf(request):
+#     pass
+#     # pdf = pdf('genetal_app/uploaded.html')
+
+
+
+def generate_pdf(request):
+    buf = io.BytesIO()
+    #Create a canvas
+    c = canvas.Canvas(buf, pagesize=letter, bottomup=0)
+    #create a text object
+    textob = c.beginText()
+    textob.setTextOrigin(inch,inch)
+    # textob.setFont("")
+
+    #Add some line of text
+    lines = [
+        "ดี ชื่อไร",
+        "This is line 2",
+        "This is line 3",
+
+    ]
+
+    #loop
+    for line in lines:
+        textob.textLine(line)
+
+
+    c.drawText(textob)
+    c.showPage()
+    c.save()
+    buf.seek(0)
+    return  FileResponse(buf, as_attachment=True, filename='test.pdf')
+
+
 @login_required
 def home(request):
     try:
@@ -159,23 +217,31 @@ def home(request):
             return HttpResponseRedirect(reverse('home'))
         # elif 'btn_sort' in request.POST:
         #     pass
-            # return render(request, 'general_app/home.html',
-            #               {'certs': zip(result, cert_date), 'certform': certform})
+        # return render(request, 'general_app/home.html',
+        #               {'certs': zip(result, cert_date), 'certform': certform})
 
-    elif 'searched' in request.GET and request.GET['searched'] is not '':
-        searched = request.GET['searched']
+    elif 'searched' in request.GET or 'date_filter' in request.GET:  # and request.GET['searched'] is not ''
+        result = []
+        searched = request.GET['searched'] if request.GET['searched'] else ''
+        date_filter = request.GET['date_filter'] if request.GET['date_filter'] else ''
+        date_filter = date_filter.split('-') if date_filter else ''
+        # result = CertificateFile.objects.filter(create_date__month=date_filter[1], create_date__year=date_filter[0])
         try:
-            result = CertificateFile.objects.filter(create_date__year=int(searched) - 543)
+            username_id = User.objects.get(username__contains=searched).id
+            search_cert = CertificateFile.objects.filter(hospital_id=username_id)
         except:
-            try:
-                username_id = User.objects.get(username__contains=searched).id
-                result = CertificateFile.objects.filter(hospital_id=username_id)
-            except:
-                username_id = User.objects.filter(username__contains=searched)
-                result = CertificateFile.objects.filter(hospital_id__in=username_id)
-        cert_date = date_th(result)
+            username_id = User.objects.filter(username__contains=searched)
+            search_cert = CertificateFile.objects.filter(hospital_id__in=username_id)
+        if date_filter != '':
+            for cert in search_cert:
+                if cert.create_date.month == int(date_filter[1]) and cert.create_date.year == int(date_filter[0]):
+                    result.append(cert)
+            cert_date = date_th(result)
+            return render(request, 'general_app/home.html',
+                          {'searched': searched, 'certs': zip(result, cert_date), 'certform': certform})
+        cert_date = date_th(search_cert)
         return render(request, 'general_app/home.html',
-                      {'searched': searched, 'certs': zip(result, cert_date), 'certform': certform})
+                      {'searched': searched, 'certs': zip(search_cert, cert_date), 'certform': certform})
     elif 'date_filter' in request.GET:
         date_filter = request.GET['date_filter'].split('-')
         result = CertificateFile.objects.filter(create_date__month=date_filter[1], create_date__year=date_filter[0])
@@ -349,7 +415,3 @@ def edit_user(request, pk):
     context = {'detail_modal': True, 'users': users, 'form_user': form_user_detail, 'name': name,
                'form_user_email': form_user}
     return render(request, 'general_app/manage_users.html', context)
-
-
-
-

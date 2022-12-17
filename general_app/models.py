@@ -18,13 +18,13 @@ class CertificateFile(models.Model):
         return self.hospital.user.username
 
 
-
 class Configuration(models.Model):
     delete_date = models.IntegerField(default=3)
     send_mail_date = models.IntegerField(default=-2)
     sender_mail = models.EmailField(null=False)
-    sender_mail_status = models.BooleanField(null=False,default=0)
-    delete_date_status = models.BooleanField(null=False,default=0)
+    sender_mail_status = models.BooleanField(null=False, default=0)
+    delete_date_status = models.BooleanField(null=False, default=0)
+
 
 class Province(models.Model):
     province = models.CharField(max_length=20, null=True, blank=True)
@@ -41,13 +41,16 @@ class Ministry(models.Model):
 
 
 class User_Detail(models.Model):
+    name = models.CharField(max_length=100, null=True)
+    position = models.CharField(max_length=50, null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    address = models.TextField( null=True, blank=True)
+    address = models.TextField(null=True, blank=True)
     province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, blank=True)
     ministry = models.ForeignKey(Ministry, on_delete=models.SET_NULL, null=True, blank=True)
-    code = models.CharField(max_length=7,  null=True, blank=True)
-    cal_date = models.DateField( null=True, blank=True)
-    send_email = models.BooleanField( null=True, blank=True)
+    code = models.CharField(max_length=7, null=True, blank=True)
+    cal_date = models.DateField(null=True, blank=True)
+    send_email = models.BooleanField(null=True, blank=True)
+    is_upload = models.BooleanField(default=0) #check upload for ceating PDF
 
     @property
     def email(self):
