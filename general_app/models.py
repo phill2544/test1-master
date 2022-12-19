@@ -9,6 +9,7 @@ class CertificateFile(models.Model):
     cert = models.FileField(upload_to='%Y/')
     hospital = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=False)
     create_date = models.DateField(auto_now_add=True, null=False)
+    count_download = models.IntegerField(null=True, default=0)
 
     def __str__(self):
         return str(self.hospital)
@@ -50,7 +51,7 @@ class User_Detail(models.Model):
     code = models.CharField(max_length=7, null=True, blank=True)
     cal_date = models.DateField(null=True, blank=True)
     send_email = models.BooleanField(null=True, blank=True)
-    is_upload = models.BooleanField(default=0) #check upload for ceating PDF
+    is_upload = models.BooleanField(default=0)  # check upload for ceating PDF
 
     @property
     def email(self):

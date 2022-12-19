@@ -138,23 +138,26 @@
                         <option value="{{ user }}"></option>
                     {% endfor %}
                 </datalist>
-                <input type="month" name="date_filter" class="ms-2">
+                <input type="month" name="date_filter" class="ms-2" {% if date_filter %}
+                       value="{{ date_filter }}" {% else %}{% endif %}>
                 <button type="submit" class="mx-2 btn btn-outline-success btn-lg">
                     {% bs_icon 'search' %}
                 </button>
 
-            <a href="{% url 'pdf' %}" >PDF</a>
-{#                <button type="button" class="btn btn-outline-secondary " role="group" data-bs-toggle="modal"#}
-{#                        data-bs-target="#filter"#}
-{#                >{% bs_icon 'filter' size='23' %}#}
-{#                </button>#}
+
+                {#                <button type="button" class="btn btn-outline-secondary " role="group" data-bs-toggle="modal"#}
+                {#                        data-bs-target="#filter"#}
+                {#                >{% bs_icon 'filter' size='23' %}#}
+                {#                </button>#}
 
 
                 {#                <button type="submit" class="btn btn-outline-secondary ms-2" name="btn_sort">#}
                 {#                    {% bs_icon 'sort-numeric-up-alt' size='23' %}#}
                 {#                </button>#}
+                <a href="{% url 'pdf' %}">pdf</a>
             </div>
         </form>
+
 
 
         {#upload#}
@@ -206,6 +209,9 @@
                     {% endif %}
                     <th scope="col">ไฟล์</th>
                     <th scope="col">วันที่</th>
+                    {% if request.user.is_superuser %}
+                        <th scope="col"></th>
+                    {% endif %}
                 </tr>
                 </thead>
                 <tbody>
@@ -214,13 +220,22 @@
                         <tr>
                             <th scope="row">{{ forloop.counter }}</th>
                             {% if request.user.is_superuser %}
-                                <td style="font-size: 18px"><strong>{{ cert.hospital }}</strong></td>
+                                <td style="font-size: 18px"><strong>{{ cert.hospital }}{{ cert.hospital_id }}</strong>
+                                </td>
                             {% endif %}
                             <td><a href="{{ cert.cert.url }}"
-                                   target="_blank">{{ cert.cert }}</a></td>
+                                   onclick="window.location.replace('{% url 'home' cert.hospital_id %}');"
+                                   target="_blank">ดาวโหลดไฟล์คลิกที่นี้</a></td>
 
                             {#                                    <td>{{ cert.create_date|date:"D d M Y" }}</td>#}
-                            <td>{{ cert_date }}</td>
+                            <td style="width: 15%">{{ cert_date }}</td>
+                            {% if request.user.is_superuser %}
+                                <td>
+                                    <button type="button" name="delete_record"
+                                            onclick="location.href='{% url 'delete_record' cert.id %}';"
+                                            class="btn btn-danger">{% bs_icon 'trash' size='23' %}</button>
+                                </td>
+                            {% endif %}
                         </tr>
                     {% endfor %}
                 </div>

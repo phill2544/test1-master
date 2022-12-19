@@ -37,7 +37,8 @@ class UserCreationForm(forms.ModelForm):
         widgets = {
             'email': forms.EmailInput(
                 attrs={'class': 'form-control', 'placeholder': 'hospital@mail.com'}),
-            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}),
+            'username': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'Username', 'autocomplete': "off"}),
             'password': forms.PasswordInput(
                 attrs={'class': 'form-control', 'placeholder': 'Password', 'id': 'password', 'name': 'password',
                        'minlength': '8'}),
