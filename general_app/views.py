@@ -2,8 +2,9 @@ import datetime
 import json
 from datetime import date
 
+from django.template import Template, Context
 from reportlab.lib import colors
-from reportlab.lib.styles import ParagraphStyle
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from xhtml2pdf import pisa
 from io import BytesIO
 from PyPDF3.pdf import BytesIO
@@ -35,6 +36,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from django.contrib.staticfiles import finders
 
 
 def month(month):
@@ -66,9 +68,13 @@ def month(month):
 
 def date_th(result):
     cert_date = []
-    for result_date in result:
-        cert_date.append('{} {} {}'.format(result_date.create_date.day, month(result_date.create_date.month),
-                                           result_date.create_date.year + 543))
+    try:
+        for result_date in result:
+            cert_date.append('{} {} {}'.format(result_date.create_date.day, month(result_date.create_date.month),
+                                               result_date.create_date.year + 543))
+    except:
+        cert_date.append('{} {} {}'.format(result.create_date.day, month(result.create_date.month),
+                                           result.create_date.year + 543))
     return cert_date;
 
 
@@ -125,6 +131,29 @@ def send_email():
     pass
 
 
+# def create_pdf(request):
+#     # Create the PDF document
+#     pdfmetrics.registerFont(TTFont('ThaiFont', 'general_app/THSarabunNew.ttf'))
+#
+#     # Create the PDF document
+#     response = HttpResponse(content_type='application/pdf')
+#     response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+#     doc = SimpleDocTemplate(response, pagesize=letter)
+#     styles = getSampleStyleSheet()
+#
+#     # Set the font in the CSS style
+#     styles.add(ParagraphStyle(name='ThaiStyle', fontName='ThaiFont', fontSize=12))
+#
+#     # Parse the HTML
+#     html = '<html><body><H1>มาเพื่อ</H1></body></html>'
+#     elements = []
+#     elements.append(Paragraph(html, styles['ThaiStyle']))
+#
+#     # Build the PDF
+#     doc.build(elements)
+#     return response
+
+
 def create_pdf(request):
     elems = []
     data = []
@@ -176,7 +205,7 @@ def create_pdf(request):
 
     # obj = {User.objects.all()}
     # pdf.drawString(2 * cm, 27 * cm, str(obj))
-    table = Table(data, colWidths=4 * cm, rowHeights=1 * cm, vAlign='TOP')
+    table = Table(data, colWidths=6 * cm, rowHeights=1 * cm, vAlign='TOP', )
     table.setStyle(TableStyle([
         ('FONT', (0, 0), (1, 1), 'THSarabun'),
         ('FONTSIZE', (0, 0), (1, 1), 20),
@@ -186,14 +215,12 @@ def create_pdf(request):
         ('FONTSIZE', (0, 4), (-1, -1), 20),
         # ('FONTSIZE', (0, 0), (-1, 0), 50),
         # ('BOX', (0, 3), (-1, -1), 1, (0, 0, 0)),
-        ('BOX', (0, 0), (1, 1), 1, (0, 0, 0)),#box in content
+        ('BOX', (0, 0), (1, 1), 1, (0, 0, 0)),  # box in content
         ('INNERGRID', (0, 0), (1, 1), 0.25, colors.black),
         ('LINEBELOW', (0, 3), (-1, -1), 0.5, colors.black),
         # ('TEXTCOLOR', (0, 0), (-1, 0), colors.red),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-
-
         # ('LINEBEFORE', (0, 0), (1,1), 2, colors.black),
         # ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
     ]))
@@ -208,12 +235,8 @@ def create_pdf(request):
 
     return response
 
-    # Return the PDF as a response
-    # response = HttpResponse(content_type='application/pdf')
-    # response['Content-Disposition'] = 'attachment; filename="mypdf.pdf"'
-    # with open('mypdf.pdf', 'rb') as f:
-    #     response.write(f.read())
-    # return None
+
+#
 
 
 @login_required
@@ -240,35 +263,33 @@ def home(request, hospital_id=None):
     user = User.objects.get(id=request.user.id)
     if request.method == 'POST':
         if 'email' in request.POST:
+            position = request.POST['position']
+            name = request.POST['name']
+            number = request.POST['number']
             email_authen = request.POST['email']
             email_valid = request.POST['email_valid']
+            user_detail = User_Detail.objects.get(user_id=request.user.id)
             if email_authen == email_valid:
+                name_split = str(name).split()
                 user.email = email_authen
+                user.first_name = name_split[0]
+                user.last_name = name_split[1]
+                user_detail.position = position
+                user_detail.number = number
                 user.save()
                 messages.success(request, 'email success')
             else:
                 messages.success(request, 'emails are not match')
                 return render(request, 'general_app/home.html',
-                              context={'email_authen': email_authen, 'email_valid': email_valid})
+                              context={'email_authen': email_authen, 'email_valid': email_valid,
+                                       'name': name,
+                                       'position': position,
+                                       'number': number})
         elif request.FILES:
             if certform.is_valid():
                 User_Detail.objects.filter(user_id=certform.cleaned_data['hospital'].id).update(is_upload=True)
                 certform.save()
-                # instance = certform.save(commit=False)
-                # instance.hospital_id = User.objects.get(username=request.POST['username']).id  # get is a object and filter is multi objects
-                # instance.save()
-                # hospital_id = User.objects.get(
-                #     username=request.POST['hospital']).id  # get is a object and filter is multi objects
-                # CertificateFile.objects.create(cert=certform.cleaned_data['cert'].name, hospital_id=hospital_id)
-            # cert_file = request.FILES['cert_file']
-            # hospital_id = User.objects.get(
-            #     username=request.POST['username']).id  # get is a object and filter is multi objects
-            # CertificateFile.objects.create(cert=cert_file.name, hospital_id=hospital_id)
-            # fs = FileSystemStorage()
-            # fs.save(cert_file.name, cert_file)
-            # messages.success(request, 'uploaded file')
             return HttpResponseRedirect(reverse('home'))
-            # return render(request, 'general_app/home.html', context)
         elif 'delete_file' in request.POST:
             delete_files = str(request.POST)
             delete_files = delete_files[delete_files.index('delete_file') + 16:delete_files.index(']}>') - 5].split(',')
@@ -329,8 +350,8 @@ def profile(request):
         form_auth = UserProfileForm(request.POST, instance=request.user)  # instance is update that user request
         form_user = User_DetailForm(request.POST)
         # print(form_auth)
-        if form_auth.is_valid() and form_user.is_valid():
-            form_auth.save()
+        if form_user.is_valid():
+            User.objects.filter(id=request.user.id).update(email=request.POST['email'])
             try:
                 if User_Detail.objects.get(user_id=request.user.id).user_id:
                     # update
@@ -390,7 +411,8 @@ def configuration(request):
             config.sender_mail = request.POST['sender_mail']
             config.save()
             state = 'เปลี่ยนการตั้งค่าเสร็จสิ้น'
-    context = {'form_configuration': form_configuration, 'province': province, 'ministry': ministry, 'state': state}
+    context = {'form_configuration': Configuration.objects.get(pk=1), 'province': province, 'ministry': ministry,
+               'state': state}
     return render(request, 'general_app/configuration.html', context)
 
 
@@ -404,15 +426,17 @@ def manage_user(request):
     if request.method == 'POST':
         form_user_detail = User_DetailForm(request.POST)
         form_user_creation = UserCreationForm(request.POST)
+        date = request.POST['cal_date']
+        cal_date = '{}-{}-{}'.format([str(date).split('/')[2]-543 , str(date).split('/')[1],str(date).split('/')[0]])
         if form_user_creation.data['password'] == form_user_creation.data['confirm_password']:
-            if form_user_detail.is_valid() and form_user_creation.is_valid():
+            if form_user_detail.is_valid():
                 form_user_creation = User.objects.create_user(request.POST['username'], request.POST['email'],
                                                               request.POST['password'],
                                                               is_superuser=request.POST['is_superuser'])
                 form_user_detail = User_Detail.objects.create(province_id=request.POST['province'],
                                                               address=request.POST['address'],
                                                               ministry_id=request.POST['ministry'],
-                                                              cal_date=request.POST['cal_date'],
+                                                              cal_date=str(cal_date),
                                                               user_id=form_user_creation.id, code=request.POST['code'])
                 form_user_creation.save()
                 form_user_detail.save()
@@ -442,27 +466,21 @@ def manage_user(request):
 
 @login_required
 def edit_user(request, pk):
+    print("edit_user")
     users = User.objects.all()
     try:
         name = User_Detail.objects.get(user_id=pk)
     except:
         pass
     if request.method == 'POST':
-        if 'delete_user' in request.POST:
-            try:
-                User.objects.get(id=pk).delete()
-                return HttpResponseRedirect(reverse('manage_user'))
-            except User.DoesNotExist:
-                messages.error(request, 'User does not exist')
-                return HttpResponseRedirect(reverse('manage_user'))
-        else:
-            form_user_detail = User_DetailForm(request.POST, instance=User_Detail.objects.get(user_id=name.user_id))
-            form_user = UserProfileForm(request.POST, instance=User.objects.get(id=name.user_id))
-            if form_user_detail.is_valid() and form_user.is_valid():
-                form_user.save()
-                form_user_detail.save()
-                return HttpResponseRedirect(reverse('manage_user'))
-                # return HttpResponseRedirect(reverse('manage_user'))
+        form_user_detail = User_DetailForm(request.POST, instance=User_Detail.objects.get(user_id=name.user_id))
+        user = User.objects.filter(id=pk)
+        form_user = UserProfileForm(request.POST, instance=User.objects.get(id=name.user_id))
+        if form_user_detail.is_valid():
+            form_user_detail.save()
+            user.update(email=request.POST['email'])
+            return HttpResponseRedirect(reverse('manage_user'))
+            # return HttpResponseRedirect(reverse('manage_user'))
     try:
         form_user_detail = User_DetailForm(instance=User_Detail.objects.get(user_id=pk))
         form_user = UserProfileForm(instance=User.objects.get(id=pk))
@@ -477,6 +495,53 @@ def edit_user(request, pk):
 
 @login_required
 def delete_record(request, pk):
+    id_user = CertificateFile.objects.get(id=pk).hospital_id
+    print(User_Detail.objects.get(user_id=id_user).is_upload)
+    User_Detail.objects.filter(user_id=id_user).update(is_upload=False)
+    print(User_Detail.objects.get(user_id=id_user).is_upload)
     CertificateFile.objects.filter(id=pk).delete()
     # User_Detail.objects.filter(user_id=request.user.id).update(is_upload=False)
     return HttpResponseRedirect(reverse('home'))
+
+
+def delete_user(request, name):
+    id = User.objects.get(username=name).id
+    try:
+        User.objects.get(id=id).delete()
+        return HttpResponseRedirect(reverse('manage_user'))
+    except User.DoesNotExist:
+        messages.error(request, 'User does not exist')
+        return HttpResponseRedirect(reverse('manage_user'))
+
+
+def dashboard(request):
+    data = {}
+    count = 0
+    for user in User.objects.all():
+        if User_Detail.objects.get(user_id=user.id).is_upload:
+            upload = CertificateFile.objects.filter(hospital_id=user.id).order_by('-create_date')[0]
+            count_download = upload.count_download
+            upload = date_th(upload)[0]
+
+        else:
+            upload = ''
+            count_download = ''
+        data[count] = {'hospital': user, 'count_download': count_download, 'upload_date': upload}
+        count += 1
+    print(data)
+    print(User.objects.all())
+    context = {
+        'data': data,
+        'users': User.objects.all()
+    }
+    return render(request, 'general_app/dashboard.html', context)
+
+
+def test(request):
+    if request.method == 'POST':
+        form = LetterForm(request.POST)
+        if form.is_valid():
+            print('test')
+    else:
+        form = LetterForm()
+    return render(request, 'general_app/test.html', {'form': form})

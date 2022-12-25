@@ -1,3 +1,4 @@
+<!doctype html>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -10,9 +11,12 @@
     <link rel="stylesheet" href="{% static 'main.css' %}"/>
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/css/bootstrap-select.css"/>
-    {#    <link type="text/css" href="@@path/vendor/sweetalert2/dist/sweetalert2.min.css" rel="stylesheet">#}
     <title>Document | Certificate</title>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"
+            integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+
 </head>
 <body>
 {% if messages %}
@@ -29,8 +33,7 @@
         </script>
     {% endfor %}
 {% endif %}
-
-
+{{ user }}
 
 
 <div class="container-fluid h-100">
@@ -41,7 +44,6 @@
                  height="400px">
             <H1 class="mt-5">กรมสนับสนุนบริการสุขภาพ</H1>
 
-
         </div>
         <div class="col "
              style="height: 100vh;display: flex;align-items:center;align-content: stretch;flex-wrap: wrap;flex-direction: column;">
@@ -50,32 +52,71 @@
             </div>
 
             <div class="form-outline w-50 mt-5">
-                <form action="{% url 'login' %}" METHOD="post">
+                <form action="{% url 'login' %}" METHOD="post" >
                     <label class="form-label" for="username" style="font-size: 18px">ชื่อผู้ใช้งาน</label>
-                    {#                <input type="email" id="form2Example1" class="form-control"/>#}
-
                     {% csrf_token %}
-                    <input    {% if messages %}
-                        {% for message in messages %}
-                            class="form-control is-invalid"
-                            value="{{ request.session.user.username }}"
-                        {% endfor %}
-                    {% else %}
-                            class="form-control "
-                    {% endif %} list="username_login" id="username"
-                            placeholder="Username" name="username" required
-                            autocomplete="off">
-                    <datalist name="username_login" id="username_login">
-                        {% for user in user %}
-                            <option value="{{ user }}">{{ user }}</option>
-                        {% endfor %}
-                    </datalist>
+
+                    {#                    <input    {% if messages %}#}
+                    {#                        {% for message in messages %}#}
+                    {#                            class="form-control is-invalid"#}
+                    {#                            value="{{ request.session.user.username }}"#}
+                    {#                        {% endfor %}#}
+                    {#                    {% else %}#}
+                    {#                            class="form-control "#}
+                    {#                    {% endif %} list="username_login" id="username"#}
+                    {#                            placeholder="Username" name="username" required#}
+                    {#                            autocomplete="off">#}
+                    {#                    <datalist name="username_login" id="username_login">#}
+                    {#                        {% for user in user %}#}
+                    {#                            <option value="{{ user }}">{{ user }}</option>#}
+                    {#                        {% endfor %}#}
+                    {#                    </datalist>#}
+
+
+                    {#                    {{ user }}#}
+                    {#                                        {% for users in user %}#}
+                    {#                                            <h1>{{ users }}</h1>#}
+                    {#                                        {% endfor %}#}
+
+
+                    <input type="hidden" id="username" name="username">
+                    <select class="js-example-basic-single form-control" id="select2_login">
+                        {% comment %}               {% for users in uesr %}
+                                                    <option value="{{ users.id }}"> {{ users }} </option>
+                                                {% endfor %}{% endcomment %}
+                        {#                        <option value="">sa</option>#}
+                        {#                        <option value="">lll</option>#}
+                    </select>
+
+                    {#{{ user }}#}
+                    {##}
+                    {#                    <select name="hospital" class="form-control">#}
+                    {#                        {% for users in uesr %}#}
+                    {#                            <option value="{{ user }}"> {{ user }} </option>#}
+                    {#                        {% endfor %}#}
+                    {#                    </select>#}
+
+
+                    {#                    <select class="js-example-basic-multiple form-control form-control-lg" style="" name="states[]"#}
+                    {#                            multiple="multiple">#}
+                    {#                        {% for user in user %}#}
+                    {#                            <option value="{{ uesr }}">{{ user }}</option>#}
+                    {#                        {% endfor %}#}
+                    {#                    </select>#}
+
+                    {##}
+                    {#                    <select class="js-example-basic-multiple form-control form-control-lg" style="" name="states[]"#}
+                    {#                            multiple="multiple">#}
+                    {#                        {% for user in user %}#}
+                    {#                            <option value="{{ uesr }}">{{ user }}</option>#}
+                    {#                        {% endfor %}#}
+                    {#                    </select>#}
+
             </div>
 
             <!-- Password input -->
             <div class="form-outline mb-6 w-50">
                 <label class="form-label" for="floatingPassword" style="font-size: 18px">รหัสผ่าน</label>
-                {#                <input type="password" id="form2Example2" class="form-control"/>#}
                 <input type="password" {% if messages %}#}
                     {% for message in messages %}
                        class="form-control is-invalid"
@@ -85,12 +126,10 @@
                 {% endif %} id="floatingPassword"
                        placeholder="รหัสผ่าน"
                        name="password" required>
-                {#                                    <label for="floatingPassword">รหัสผ่าน</label>#}
-
             </div>
 
             <!-- Submit button -->
-            <button type="submit" class="btn btn-primary btn-block mt-5">เข้าสู่ระบบ</button>
+            <button type="submit" class="btn btn-primary btn-block mt-5" id="submit_login">เข้าสู่ระบบ</button>
 
             <!-- Register buttons -->
             </form>
@@ -98,90 +137,34 @@
     </div>
 </div>
 
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+<script>
+
+{% comment %}    $('#myform').on('submit', function () {
+
+
+        return true;
+    });{% endcomment %}
+    $(document).ready(function () {
+        $("#select2_login").append('{% for user in user %}'+'<option value="' + {{ user.id }} +'">'
+            + '{{ user }}'+ '</option>'+'{% endfor %}')
+        {#console.log('{{ user }}')#}
+        $("#submit_login").on('click', function () {
+            {#alert($("#select2_login").find("option:selected").text() + ' clicked!');#}
+            var selected = $("#select2_login").find("option:selected").text();
+            document.getElementById("username").value = selected;
+        });
+        $('.js-example-basic-single').select2();
+    });
+    {% comment %}        $(document).ready(function () {
+                $('.js-example-basic-multiple').select2();
+            });{% endcomment %}
+</script>
+
+
 </body>
 </html>
 
-
-{#    <div>#}
-{#        <form action="{% url 'login' %}" METHOD="post" style="margin:50px">#}
-{#            {% csrf_token %}#}
-{#            {% if messages %}#}
-{#                {% for message in messages %}#}
-{#                    <script>#}
-{#                        Swal.fire({#}
-{#                            title: 'รหัสผ่านผิด กรุณากรอกใหม่',#}
-{#text: 'กรุณากรอกผู้ใช้งานและรหัสผ่านให้ถูกต้อง ',#}
-{#                            text: '',#}
-{#                            icon: 'error',#}
-{#                            confirmButtonText: 'Cool',#}
-{#                            timer: 1500#}
-{#                        })#}
-{#                    </script>#}
-{#                {% endfor %}#}
-{#            {% endif %}#}
-{#            <div class="form-group">#}
-{#            <label for="username" class="form-label">Email address</label>#}
-{#                <div class="form-floating">#}
-{##}
-{#                    <input    {% if messages %}#}
-{#                        {% for message in messages %}#}
-{#                            class="form-control is-invalid"#}
-{#                        {% endfor %}#}
-{#                    {% else %}#}
-{#                            class="form-control "#}
-{#                    {% endif %} list="username_login" id="username"#}
-{#                            placeholder="Username" name="username" required value="{{ request.POST.username }}"#}
-{#                            autocomplete="off">#}
-{#                    <datalist name="username_login" id="username_login">#}
-{#                        {% for user in user %}#}
-{#                            <option value="{{ user }}">{{ user }}</option>#}
-{#                        {% endfor %}#}
-{#                    </datalist>#}
-{#                    <label for=" floatingPassword">ชื่อผู้ใช้งาน</label>#}
-{#                </div>#}
-{##}
-{#                <div class="form-floating">#}
-{#                    <select class="form-select" name="username">#}
-{#                        {% for user in user %}#}
-{#                            <option value="{{ user }}">{{ user }}</option>#}
-{#                        {% endfor %}#}
-{#                    </select>#}
-{#                    <label for="floatingSelect">Name</label>#}
-{#                </div>#}
-{##}
-{#                <select name="username" class="form-select" aria-label="Default select example">#}
-{#                    {% for user in user %}#}
-{#                        <option value="{{ user }}">{{ user }}</option>#}
-{#                    {% endfor %}#}
-{#                </select>#}
-{#                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone#}
-{#                    else.</small>#}
-{#            </div>#}
-{#                    <div class="form-group">#}
-{#                        <label for="password">Password</label>#}
-{#                        <input type="password" class="form-control" id="password" placeholder="Password"#}
-{#                               name="password">#}
-{#                    </div>#}
-{#                <label for="floatingPassword" class="form-label">Password</label>#}
-{#                <div class="form-floating">#}
-{#                    <input type="password" {% if messages %}#}
-{#                        {% for message in messages %}#}
-{#                           class="form-control is-invalid"#}
-{#                        {% endfor %}#}
-{#                    {% else %}#}
-{#                           class="form-control "#}
-{#                    {% endif %} id="floatingPassword"#}
-{#                           placeholder="รหัสผ่าน"#}
-{#                           name="password" required>#}
-{#                    <label for="floatingPassword">รหัสผ่าน</label>#}
-{#                </div>#}
-{#                <button type="submit" class="btn btn-primary">Submit</button>#}
-{#                {% if request.GET.next %}#}
-{#                    <input type="hidden" name="next" value="{{ request.GET.next }}">#}
-{#                {% endif %}#}
-{##}
-{#            </div>#}
-{#        </form>#}
-{#    </div>#}
-{##}
-{##}

@@ -14,7 +14,6 @@
         </form>
     </div>
 
-
     {% for message in messages %}
         {% if message.message == "uploaded file" %}
             <script>
@@ -128,71 +127,40 @@
 
     {#search#}
     {% if request.user.is_superuser %}
+        {{ users }}
         <form action="{% url 'home' %}" method="get">
             <div class="d-flex justify-content-center flex-wrap" style="margin-top: 30px">
-                <input type="search" class="form-control form-control-lg w-25" placeholder="ค้นหา..."
-                       aria-label="Search" name="searched" list="datalist_search" autocomplete="off"
-                       aria-describedby="search-addon" {% if searched %} value="{{ searched }}" {% endif %} />
-                <datalist id="datalist_search">
-                    {% for user in users %}
-                        <option value="{{ user }}"></option>
-                    {% endfor %}
-                </datalist>
-                <input type="month" name="date_filter" class="ms-2" {% if date_filter %}
-                       value="{{ date_filter }}" {% else %}{% endif %}>
+                <div class="input-group w-25" style="font-size: 27px;height: 50px">
+                    <select class="js-example-basic-multiple form-control form-control-lg" style="" name="states[]"
+                            multiple="multiple">
+                        {% for user in users %}
+                            <option value="{{ user }}">{{ user }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                {#                <input type="search" class="form-control form-control-lg w-25" placeholder="ค้นหา..."#}
+                {#                       aria-label="Search" name="searched" list="datalist_search" autocomplete="off"#}
+                {#                       aria-describedby="search-addon" {% if searched %} value="{{ searched }}" {% endif %} />#}
+                {#                <datalist id="datalist_search">#}
+                {#                    {% for user in users %}#}
+                {#                        <option value="{{ user }}"></option>#}
+                {#                    {% endfor %}#}
+                {#                </datalist>#}
+
+
+                {#            date#}
+                {#                <input type="month" name="date_filter" class="ms-2" {% if date_filter %}#}
+                {#                       value="{{ date_filter }}" {% else %}{% endif %}>#}
+                {#            date#}
                 <button type="submit" class="mx-2 btn btn-outline-success btn-lg">
                     {% bs_icon 'search' %}
                 </button>
 
+                <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#add_cert">
+                    {% bs_icon 'plus-circle' size='23' %}
+                </button>
 
-                {#                <button type="button" class="btn btn-outline-secondary " role="group" data-bs-toggle="modal"#}
-                {#                        data-bs-target="#filter"#}
-                {#                >{% bs_icon 'filter' size='23' %}#}
-                {#                </button>#}
-
-
-                {#                <button type="submit" class="btn btn-outline-secondary ms-2" name="btn_sort">#}
-                {#                    {% bs_icon 'sort-numeric-up-alt' size='23' %}#}
-                {#                </button>#}
-                <a href="{% url 'pdf' %}">pdf</a>
-            </div>
-        </form>
-
-
-
-        {#upload#}
-        <form action="{% url 'home' %}" method="post" enctype="multipart/form-data"
-              onsubmit="submit_file.disabled = true; return true;">
-            {% csrf_token %}
-            <div class="d-flex justify-content-center flex-wrap mb-3" style="margin-top: 25px">
-
-
-                <div class="p-1">
-                    {{ certform.cert }}
-                    {#                    <input class="form-control form-control-lg " type="file" required name="cert_file">#}
-                </div>
-                <div class="p-1 mx-2">
-                    {{ certform.hospital }}
-                    {#                    <datalist id="datalistOptions" >#}
-                    {#                        {% for user in users %}#}
-                    {#                            <option value="{{ user }}"></option>#}
-                    {#                        {% endfor %}#}
-                    {#                    </datalist>#}
-
-
-                    {#                    <input class="form-control form-control-lg " list="datalistOptions" id="exampleDataList"#}
-                    {#                           placeholder="ชื่อโรงพยาบาล" required name="username">#}
-                    {#                    <datalist id="datalistOptions">#}
-                    {#                        {% for user in users %}#}
-                    {#                            <option value="{{ user }}">#}
-                    {#                        {% endfor %}#}
-                    {#                    </datalist>#}
-                </div>
-                <div class="btn-group btn-group-lg p-1" role="group" aria-label="...">
-                    <button type="submit" class="btn btn-outline-success " role="group" id="submit_file"
-                            name="submit_files">อัปโหลด
-                    </button>
-                </div>
             </div>
         </form>
     {% endif %}
@@ -202,7 +170,7 @@
         <div class="p-2 flex-grow-2 bd-highlight w-75 table-responsive">
             <table class="table table-lg table-hover ">
                 <thead>
-                <tr>
+                <tr style="font-size: 20px">
                     <th scope="col">ลำดับที่</th>
                     {% if request.user.is_superuser %}
                         <th scope="col">โรงพยาบาล</th>
@@ -220,7 +188,7 @@
                         <tr>
                             <th scope="row">{{ forloop.counter }}</th>
                             {% if request.user.is_superuser %}
-                                <td style="font-size: 18px"><strong>{{ cert.hospital }}{{ cert.hospital_id }}</strong>
+                                <td style="font-size: 18px">{{ cert.hospital }}{{ cert.hospital_id }}
                                 </td>
                             {% endif %}
                             <td><a href="{{ cert.cert.url }}"
@@ -231,8 +199,8 @@
                             <td style="width: 15%">{{ cert_date }}</td>
                             {% if request.user.is_superuser %}
                                 <td>
-                                    <button type="button" name="delete_record"
-                                            onclick="location.href='{% url 'delete_record' cert.id %}';"
+                                    <button type="button" name="delete_record" onclick="delete_rec({{ cert.id }})"
+                                            {#                                            onclick="location.href='{% url 'delete_record' cert.id %}';"#}
                                             class="btn btn-danger">{% bs_icon 'trash' size='23' %}</button>
                                 </td>
                             {% endif %}
@@ -265,9 +233,19 @@
                         </div>
                         <div class="modal-body">
                             <div class="container">
-                                <label>
-                                    อีเมล
-                                </label>
+                                <label>ตำแหน่ง</label>
+                                <input type="text" class="form-control mb-3"
+                                       placeholder="ตำแหน่ง" name="position" required
+                                       {% if email_authen %}value="{{ position }} {% endif %}">
+                                <label>ชื่อ-นามสกุล</label>
+                                <input type="text" class="form-control mb-3"
+                                       placeholder="ชื่อ-สกุล" name="name" required
+                                       {% if email_authen %}value="{{ name }} {% endif %}">
+                                <label>เบอร์โทร</label>
+                                <input type="text" class="form-control mb-3"
+                                       placeholder="เบอร์โทรที่สามารถติดต่อได้" name="number" required
+                                       {% if email_authen %}value="{{ number }} {% endif %}">
+                                <label>อีเมล</label>
                                 <input type="email" class="form-control mb-3" id="exampleInputEmail1"
                                        aria-describedby="emailHelp"
                                        placeholder="กรอกอีเมล" name="email" required
@@ -282,9 +260,9 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger me-auto" data-bs-dismiss="modal"
-                                    onclick="location.href='{% url 'logout' %}';">Logout
+                                    onclick="location.href='{% url 'logout' %}';">ออกจากระบบ
                             </button>
-                            <button type="submit" class="btn btn-primary" name="btn_email">Save changes</button>
+                            <button type="submit" class="btn btn-primary" name="btn_email">ยืนยัน</button>
                         </div>
                     </div>
                 </div>
@@ -313,8 +291,8 @@
                         <input>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary">ยืนยัน</button>
                     </div>
                 </div>
             </div>
@@ -324,10 +302,92 @@
 
 
 
+    {#    add_cert #}
+    <div class="modal fade" id="add_cert" aria-labelledby="exampleModalLabel" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {#upload#}
+                    <form action="{% url 'home' %}" method="post" enctype="multipart/form-data"
+                          onsubmit="submit_file.disabled = true; return true;">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-center flex-wrap mb-3" style="margin-top: 25px">
+
+
+                            <div class="input-group ">
+                                {#                        <select class="js-example-basic-multiple form-control form-control-lg" name="states[]"#}
+                                {#                                multiple="multiple">#}
+                                <div class="selection2_name" >
+                                    {{ certform.hospital }}
+                                </div>
+                                {#                            {% for user in users %}#}
+                                {#                                <option value="{{ uesr }}">{{ user }}</option>#}
+                                {#                            {% endfor %}#}
+                                {#                        </select>#}
+                                <div class="w-50">
+                                    {{ certform.cert }}
+                                </div>
+                            </div>
+
+                            <div class="p-1">
+
+                                {#                    <input class="form-control form-control-lg " type="file" required name="cert_file">#}
+                            </div>
+                            <div class="btn-group btn-group-lg p-1" role="group" aria-label="...">
+                                <button type="submit" class="btn btn-outline-success " role="group" id="submit_file"
+                                        name="submit_files">อัปโหลด
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
     <script src="{% static 'designer/js/jquery.cookie.js' %}"></script>
+
+
+    <script>
+        console.log('select2');
+        $('#mySelect2').select2({
+            dropdownParent: $('#add_cert')
+        });
+    </script>
+
+
+
     <script>
 
+        function delete_rec(item) {
 
+            Swal.fire({
+                title: 'ต้องการจะลบเอกสารนี้หรือไม่',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonText: 'ยืนยัน'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    item = item.toString()
+                    window.location.replace(item);
+                }
+            })
+        }
     </script>
 {% endblock %}
 

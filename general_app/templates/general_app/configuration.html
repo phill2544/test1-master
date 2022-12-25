@@ -22,7 +22,7 @@
         </script>
     {% endif %}
     <div class="container w-75">
-        <form action="{% url 'configuration' %}" method="post" class="mt-3">
+        <form action="{% url 'configuration' %}" method="post" class="mt-3" id="form_delete_province">
             {% csrf_token %}
             <label for="sender_mail">จังหวัด</label>
             <div class="d-flex bd-highlight">
@@ -35,7 +35,7 @@
                     </select>
                 </div>
                 <div class="mx-2 flex-shrink-1 bd-highlight">
-                    <button type="submit" class="btn btn-danger "
+                    <button type="button" class="btn btn-danger" onclick="delete_btn('province')"
                             name="btn_delete_province" {% if province %}{% else %}disabled{% endif %}>
                         ลบ
                     </button>
@@ -50,7 +50,7 @@
         </form>
 
 
-        <form action="{% url 'configuration' %}" method="post" class="mb-3">
+        <form action="{% url 'configuration' %}" method="post" class="mb-3" id="form_delete_ministry">
             {% csrf_token %}
             <label for="sender_mail">กระทรวง</label>
             <div class=" d-flex bd-highlight">
@@ -63,7 +63,7 @@
                     </select>
                 </div>
                 <div class="mx-2 flex-shrink-1 bd-highlight">
-                    <button type="submit" class="btn btn-danger " name="btn_delete_ministry"
+                    <button type="button" class="btn btn-danger " name="btn_delete_ministry" id="btn_delete_ministry" onclick="delete_btn('ministry')"
                             {% if ministry %}{% else %}disabled{% endif %}>
                         ลบ
                     </button>
@@ -78,24 +78,26 @@
         </form>
 
 
-        <form action="{% url 'configuration' %}" method="post" class="">
+        <form action="{% url 'configuration' %}" method="post">
             {% csrf_token %}
             <label for="delete_date">เลือกเวลาลบไฟล์</label>
             <div class=" d-flex bd-highlight">
                 <div class="w-100 bd-highlight">
                     <select class="form-select mb-3" aria-label="Default select example"
                             name="delete_date"
-                            id="delete_date" {% if not form_configuration.delete_date_status %}disabled{% endif %}>
+                            id="delete_date"
+                            {% if not form_configuration.delete_date_status %}style="pointer-events: none;background-color: darkgray" {% endif %}>
                         {% for count in '12345'|make_list %}
                             <option value="{{ forloop.counter }}"
                                     {% if forloop.counter == form_configuration.delete_date %}selected {% else %}{% endif %}>{{ forloop.counter }}ปี
                             </option>
                         {% endfor %}
                     </select>
+                    {#                 <input type="hidden" name="delete_date" value="{{ forloop.counter }}" />#}
                 </div>
                 <div class="ms-2 flex-shrink-1 bd-highlight">
                     {% if form_configuration.delete_date_status %}
-                        <button type="submit" class="btn btn-success " name="is_delete">เปิด</button>
+                        <button type="submit" class="btn btn-success" name="is_delete">เปิด</button>
                     {% else %}
                         <button type="submit" class="btn btn-outline-secondary " name="is_delete">ปิด</button>
                     {% endif %}
@@ -107,7 +109,8 @@
                 <div class="w-100 bd-highlight">
                     <select class="form-select mb-3" aria-label="Default select example"
                             name="send_mail_date"
-                            id="send_mail_date" {% if not form_configuration.sender_mail_status %}disabled{% endif %}>
+                            id="send_mail_date" {% if not form_configuration.sender_mail_status %}
+                            style="pointer-events: none;background-color: darkgray" {% endif %}>
                         {% for count in '123456'|make_list %}
                             <option value="{{ forloop.counter }}"
                                     {% if forloop.counter == form_configuration.send_mail_date %}selected {% else %}{% endif %}>{{ forloop.counter }}เดือน
@@ -116,7 +119,7 @@
                     </select>
                 </div>
                 <div class="ms-2 flex-shrink-1 bd-highlight">
-                   {% if form_configuration.sender_mail_status %}
+                    {% if form_configuration.sender_mail_status %}
                         <button type="submit" class="btn btn-success " name="is_send">เปิด</button>
                     {% else %}
                         <button type="submit" class="btn btn-outline-secondary " name="is_send">ปิด</button>
@@ -156,7 +159,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <input class="form-control form-control-lg" type="text" name="add_province">
+                        <input class="form-control form-control-lg" type="text" name="add_province" autocomplete="off">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
@@ -180,7 +183,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <input class="form-control form-control-lg" type="text" name="add_ministry" >
+                        <input class="form-control form-control-lg" type="text" name="add_ministry" autocomplete="off">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
@@ -191,5 +194,30 @@
         </div>
     </form>
 
+    <script>
+        function delete_btn(item) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if(item == 'province'){
+                         let form = document.getElementById("form_delete_province");
+                    form.submit()
+                    }
+                    else{
+                        let form = document.getElementById("form_delete_ministry");
+                    form.submit()
+                    }
+                }
+            })
+
+        }
+    </script>
 
 {% endblock %}

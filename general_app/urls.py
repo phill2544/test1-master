@@ -16,7 +16,10 @@ urlpatterns = [
     path('configuration/', views.configuration, name='configuration'),
     path('Manage_users/', views.manage_user, name='manage_user'),
     path('Manage_users/<int:pk>/', views.edit_user, name='edit_user'),
+    path('Manage_users/<str:name>/', views.delete_user, name='delete_user'),
     path('pdf/', views.create_pdf, name='pdf'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('test/',views.test,name='test')
 
 ]
 

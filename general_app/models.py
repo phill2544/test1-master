@@ -42,7 +42,6 @@ class Ministry(models.Model):
 
 
 class User_Detail(models.Model):
-    name = models.CharField(max_length=100, null=True)
     position = models.CharField(max_length=50, null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     address = models.TextField(null=True, blank=True)
@@ -52,6 +51,7 @@ class User_Detail(models.Model):
     cal_date = models.DateField(null=True, blank=True)
     send_email = models.BooleanField(null=True, blank=True)
     is_upload = models.BooleanField(default=0)  # check upload for ceating PDF
+    number = models.CharField(max_length=10,null=True)
 
     @property
     def email(self):

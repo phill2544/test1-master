@@ -1,0 +1,69 @@
+{% extends 'general_app/base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+    {% load bootstrap_icons %}
+
+    <form action="{% url 'dashboard' %}" method="get">
+        <div class="d-flex justify-content-center flex-wrap " style="margin-top: 30px">
+            <div class="input-group w-25" style="font-size: 27px;height: 50px">
+                <select class="js-example-basic-multiple form-control form-control-lg" style="" name="states[]"
+                        multiple="multiple">
+                    {% for user in users %}
+                        <option value="{{ uesr }}">{{ user }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+
+            {#            <input type="search" class="form-control form-control-lg w-25" placeholder="ค้นหา..."#}
+            {#                   aria-label="Search" name="searched" list="datalist_search" autocomplete="off"#}
+            {#                   aria-describedby="search-addon" {% if searched %} value="{{ searched }}" {% endif %} />#}
+            {#            <datalist id="datalist_search">#}
+            {#                {% for user in users %}#}
+            {#                    <option value="{{ user }}"></option>#}
+            {#                {% endfor %}#}
+            {#            </datalist>#}
+
+
+            <input type="month" name="date_filter" class="ms-2" {% if date_filter %}
+                   value="{{ date_filter }}" {% else %}{% endif %}>
+            <button type="submit" class="mx-2 btn btn-outline-success btn-lg">
+                {% bs_icon 'search' %}
+            </button>
+            <div class="form-check" style="display: flex; align-items: center">
+                <input class="form-check-input me-2" type="checkbox" value="" id="flexCheckDefault">
+                <label class="form-check-label" for="flexCheckDefault">
+                    อัปโหลด
+                </label>
+            </div>
+            <a href="{% url 'pdf' %}">pdf</a>
+        </div>
+    </form>
+
+    <div class="d-flex justify-content-center flex-wrap ">
+        <div class="p-2 flex-grow-2 bd-highlight w-75 table-responsive">
+            <table class="table table-lg table-hover">
+                <thead>
+                <tr style="font-size: 20px;">
+                    <th scope="col">โรงพยาบาล</th>
+                    <th scope="col">วันที่อัปโหลด</th>
+                    <th scope="col">จำนวนการดาวน์โหลด</th>
+                </tr>
+                </thead>
+                <tbody style="font-size: 18px">
+                {% for count,value in data.items %}
+                    <tr>
+                        <td> {{ value.hospital }}</td>
+                        <td>{{ value.upload_date }}</td>
+                        <td> {{ value.count_download }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+
+{% endblock %}

@@ -76,13 +76,11 @@
 
                         </td>
                         <td>
-                            <form action="{% url 'edit_user' user.id %}" method="post">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-danger" data-bs-toggle="modal"
-                                        data-bs-target="#detail" name="delete_user"
+{#                            <form action="{% url 'edit_user' user.id %}" method="post">#}
+{#                                {% csrf_token %}#}
+                                <button type="button" class="btn btn-danger" name="delete_user" onclick="delete_user('{{ user.username }}')">
 {#                                        onclick="location.href='{% url 'edit_user' user.id %}';" name="delete_user"#}
-                                >
-                                    {% bs_icon 'trash' size='23' %}{{ user.id }}
+                                    {% bs_icon 'trash' size='23' %}
                                 </button>
                             </form>
 
@@ -387,6 +385,23 @@
             } else {
                 password1.type = "password";
             }
+        }
+
+        function delete_user(id) {
+             Swal.fire({
+                title: 'ต้องการจะลบผู้ใช้งานนี้หรือไม่',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'ยืนยัน',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    console.log(id)
+                    window.location.replace(id);
+                }
+            })
         }
 
     </script>

@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+
     {% load static %}
     {% load bootstrap_icons %}
     <meta charset="UTF-8">
@@ -17,50 +18,46 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/css/bootstrap-select.css"/>
     <link rel="stylesheet" href="{% static 'main.css' %}"/>
 
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
 
 
+    <style>
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__display {
+            padding-left: 11px;
+        }
+
+        .select2-container .select2-search--inline .select2-search__field {
+            height: 39px;
+        }
+
+        .select2-container .select2-selection--single {
+            height: 47px;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: normal;
+        }
+
+        {#span.select2-container {#}
+        {#    z-index: 10050;#}
+        {#{#}
+        #}#}
+
+        {#.modal-open .select2-container {#}
+        {#    z-index: 9999;#}
+        {#}#}
+
+    </style>
+
+
+    <link href="{% static 'bootstrap-datepicker-thai-thai/css/datepicker.css' %}" rel="stylesheet" media="screen">
+    {#    <link href="//getbootstrap.com/2.3.2/assets/js/google-code-prettify/prettify.css" rel="stylesheet">#}
+    {#    <link href="//getbootstrap.com/2.3.2/assets/css/bootstrap-responsive.css" rel="stylesheet">#}
 
 
 </head>
 <body>
 <header>
-    {#    <nav class="navbar navbar-expand-md navbar-dark bg-dark">#}
-    {#    <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">#}
-    {#        <ul class="navbar-nav mr-auto">#}
-    {#            <li class="nav-item active">#}
-    {#                <a class="nav-link" href="#">Left</a>#}
-    {#            </li>#}
-    {#            <li class="nav-item">#}
-    {#                <a class="nav-link" href="//codeply.com">Codeply</a>#}
-    {#            </li>#}
-    {#            <li class="nav-item">#}
-    {#                <a class="nav-link" href="#">Link</a>#}
-    {#            </li>#}
-    {#            <li class="nav-item">#}
-    {#                <a class="nav-link" href="#">Link</a>#}
-    {#            </li>#}
-    {#            <li class="nav-item">#}
-    {#                <a class="nav-link" href="#">Link</a>#}
-    {#            </li>#}
-    {#        </ul>#}
-    {#    </div>#}
-    {#    <div class="mx-auto order-0">#}
-    {#        <a class="navbar-brand mx-auto" href="#">Navbar 2</a>#}
-    {#        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2">#}
-    {#            <span class="navbar-toggler-icon"></span>#}
-    {#        </button>#}
-    {#    </div>#}
-    {#    <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">#}
-    {#        <ul class="navbar-nav ml-auto">#}
-    {#            <li class="nav-item">#}
-    {#                <a class="nav-link" href="#">Right</a>#}
-    {#            </li>#}
-    {#            <li class="nav-item">#}
-    {#                <a class="nav-link" href="#">Link</a>#}
-    {#            </li>#}
-    {#        </ul>#}
-    {#    </div>#}
-    {#</nav>#}
 
 
     <nav class="navbar navbar-expand-md navbar-dark bg-success">
@@ -77,16 +74,23 @@
                 <ul class="navbar-nav ">
                     <li class="nav-item active">
                         <a class="nav-link " href="{% url 'home' %}" id="btn_home" style="font-size: 18px">
-                            {% bs_icon 'folder2-open' size='23' %} หน้าแรก</a>
+                            {% bs_icon 'folder2-open' size='23' %} <span class="sr-only" style="font-size: 18px">ใบรับรอง </span>
+                        </a>
                     </li>
                     {% if request.user.is_superuser %}
+                        <li class="nav-item active">
+                            <a class="nav-link " href="{% url 'dashboard' %}" style="font-size: 18px">
+                                {% bs_icon 'folder2-open' size='23' %} <span class="sr-only" style="font-size: 18px">รายงาน</span>
+                            </a>
+                        </li>
                         <li class="nav-item active">
                             <a class="nav-link" href="{% url 'manage_user' %}">{% bs_icon 'person-gear' size='23' %}
                                 <span class="sr-only" style="font-size: 18px">จัดการผู้ใช้งาน</span></a>
                         </li>
                         <li class="nav-item active">
                             <a class="nav-link" style="font-size: 18px"
-                               href="{% url 'configuration' %}">{% bs_icon 'gear' size='23' %}ตั้งค่า<span
+                               href="{% url 'configuration' %}">{% bs_icon 'gear' size='23' %} <span class="sr-only"
+                                                                                                     style="font-size: 18px">ตั้งค่า</span><span
                                     class="sr-only"></span></a>
                         </li>
                     {% endif %}
@@ -97,12 +101,13 @@
                         <li class="nav-item active">
                             <a class="nav-link" href=" {% url 'profile' %}" style="font-size: 18px">
                                 {% bs_icon 'person-circle' size='23' %}
-                                </i>{{ user.username }}<span
+                                </i> <span class="sr-only" style="font-size: 18px">{{ user.username }}</span><span
                                     class="sr-only"></span></a>
                         </li>
                         <li class="nav-item active">
                             <a class="nav-link" style="font-size: 18px"
-                               href="{% url 'logout' %}">{% bs_icon 'door-open' size='23' %}ออกจากระบบ<span
+                               href="{% url 'logout' %}">{% bs_icon 'door-open' size='23' %} <span class="sr-only"
+                                                                                                   style="font-size: 18px">ออกจากระบบ</span><span
                                     class="sr-only"></span></a>
                         </li>
                     {% endif %}
@@ -114,6 +119,7 @@
 
 </header>
 <footer></footer>
+
 <!-- JavaScript Bundle with Popper -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
@@ -121,20 +127,75 @@
         crossorigin="anonymous">
 
 </script>
+
+
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/js/bootstrap-select.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.1.min.js"
         integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="{% static 'main.js' %}"></script>
 <script type="text/javascript">
     $(document).ready(function () { //auto open model
         $('#exampleModal').modal('show');
     });
+    $(document).ready(function () {
+        $('.js-example-basic-multiple').select2();
+    });
+    {% comment %}$(document).ready(function () {
+        $('.js-example-basic-single').select2();
+    });{% endcomment %}
+
+
 </script>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 {% block content %}{% endblock %}
 
 {% load sweetify %}
 {% sweetify %}
+
+
+{#<script src="//getbootstrap.com/2.3.2/assets/js/jquery.js"></script>#}
+{#<script src="//getbootstrap.com/2.3.2/assets/js/google-code-prettify/prettify.js"></script>#}
+
+<script src="{% static 'bootstrap-datepicker-thai-thai/js/bootstrap-datepicker.js' %}"></script>
+<script src="{% static 'bootstrap-datepicker-thai-thai/js/bootstrap-datepicker-thai.js' %}"></script>
+<script src="{% static 'bootstrap-datepicker-thai-thai/js/locales/bootstrap-datepicker.th.js' %}"></script>
+
+<script id="example_script" type="text/javascript">
+    function demo() {
+        $('.datepicker').datepicker();
+    }
+</script>
+
+<script type="text/javascript">
+    $(function () {
+        $('pre[data-source]').each(function () {
+            var $this = $(this),
+                $source = $($this.data('source'));
+
+            var text = [];
+            $source.each(function () {
+                var $s = $(this);
+                if ($s.attr('type') == 'text/javascript') {
+                    text.push($s.html().replace(/(\n)*/, ''));
+                } else {
+                    text.push($s.clone().wrap('<div>').parent().html()
+                        .replace(/(\"(?=[[{]))/g, '\'')
+                        .replace(/\]\"/g, ']\'').replace(/\}\"/g, '\'') // javascript not support lookbehind
+                        .replace(/\&quot\;/g, '"'));
+                }
+            });
+
+            $this.text(text.join('\n\n').replace(/\t/g, '    '));
+        });
+
+        prettyPrint();
+        demo();
+    });
+</script>
+
 
 </body>
 </html>

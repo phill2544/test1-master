@@ -1,0 +1,10 @@
+{% extends 'general_app/base.html' %}
+{% block title %}Test{% endblock %}
+{% block content %}
+<form method="post" action="{% url 'test' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Submit">
+<button type="submit">ofdsfds </button>
+</form>
+{% endblock %}
