@@ -11,3 +11,5 @@ from django import forms
 #             'new_password1': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}),
 #             'new_password2': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}),
 #         }
+
+

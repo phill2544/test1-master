@@ -20,6 +20,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
 
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
 
     <style>
         .select2-container--default .select2-selection--multiple .select2-selection__choice__display {
@@ -38,21 +39,25 @@
             line-height: normal;
         }
 
-        {#span.select2-container {#}
-        {#    z-index: 10050;#}
-        {#{#}
-        #}#}
+{% comment %}        span.select2-container {
+            z-index: 10050;
+        {
+        #}
 
-        {#.modal-open .select2-container {#}
-        {#    z-index: 9999;#}
-        {#}#}
+        .modal-open .select2-container {
+            z-index: 9999;
+        {
+        #}{% endcomment %}
 
     </style>
 
 
     <link href="{% static 'bootstrap-datepicker-thai-thai/css/datepicker.css' %}" rel="stylesheet" media="screen">
-    {#    <link href="//getbootstrap.com/2.3.2/assets/js/google-code-prettify/prettify.css" rel="stylesheet">#}
+    {#        <link href="//getbootstrap.com/2.3.2/assets/js/google-code-prettify/prettify.css" rel="stylesheet">#}
     {#    <link href="//getbootstrap.com/2.3.2/assets/css/bootstrap-responsive.css" rel="stylesheet">#}
+
+    {#date_range#}
+    <link rel="stylesheet" type="text/css" href="{% static 'daterangepicker-master/daterangepicker.css' %}"/>
 
 
 </head>
@@ -97,7 +102,6 @@
                 </ul>
 
                 <ul class="navbar-nav ms-auto">
-                    {% if user.is_authenticated %}
                         <li class="nav-item active">
                             <a class="nav-link" href=" {% url 'profile' %}" style="font-size: 18px">
                                 {% bs_icon 'person-circle' size='23' %}
@@ -110,7 +114,6 @@
                                                                                                    style="font-size: 18px">ออกจากระบบ</span><span
                                     class="sr-only"></span></a>
                         </li>
-                    {% endif %}
                 </ul>
             </div>
         </div>
@@ -140,11 +143,13 @@
         $('#exampleModal').modal('show');
     });
     $(document).ready(function () {
-        $('.js-example-basic-multiple').select2();
+        $('.js-example-basic-multiple').select2({
+            placeholder: " ค้นหา..."
+        });
     });
-    {% comment %}$(document).ready(function () {
-        $('.js-example-basic-single').select2();
-    });{% endcomment %}
+    {% comment %}    $(document).ready(function () {
+            $('.js-example-basic-single').select2();
+        });{% endcomment %}
 
 
 </script>
@@ -163,13 +168,20 @@
 <script src="{% static 'bootstrap-datepicker-thai-thai/js/bootstrap-datepicker-thai.js' %}"></script>
 <script src="{% static 'bootstrap-datepicker-thai-thai/js/locales/bootstrap-datepicker.th.js' %}"></script>
 
+{#date_range#}
+{#<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>#}
+{#<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>#}
+<script type="text/javascript" src="{% static 'daterangepicker-master/moment.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'daterangepicker-master/daterangepicker.js' %}"></script>
+
+
 <script id="example_script" type="text/javascript">
-    function demo() {
-        $('.datepicker').datepicker();
-    }
+    $('.datepicker').datepicker({
+        format: 'dd-mm-yyyy'
+    });
 </script>
 
-<script type="text/javascript">
+{% comment %}<script type="text/javascript">
     $(function () {
         $('pre[data-source]').each(function () {
             var $this = $(this),
@@ -194,7 +206,7 @@
         prettyPrint();
         demo();
     });
-</script>
+</script>{% endcomment %}
 
 
 </body>

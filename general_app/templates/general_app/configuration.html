@@ -27,7 +27,7 @@
             <label for="sender_mail">จังหวัด</label>
             <div class="d-flex bd-highlight">
                 <div class="w-100 bd-highlight">
-                    <select class="form-select mb-3" aria-label="Default select example"
+                    <select class="form-select mb-3 form-select-lg" aria-label="Default select example"
                             name="select_province">
                         {% for province in province %}
                             <option value={{ province }}>{{ province }}</option>
@@ -35,13 +35,13 @@
                     </select>
                 </div>
                 <div class="mx-2 flex-shrink-1 bd-highlight">
-                    <button type="button" class="btn btn-danger" onclick="delete_btn('province')"
+                    <button type="button" class="btn btn-danger btn-lg" onclick="delete_btn('province')"
                             name="btn_delete_province" {% if province %}{% else %}disabled{% endif %}>
                         ลบ
                     </button>
                 </div>
                 <div class="flex-shrink-1 bd-highlight">
-                    <button type="button" class="btn btn-success " data-bs-toggle="modal"
+                    <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal"
                             data-bs-target="#add_province">
                         เพิ่ม
                     </button>
@@ -55,7 +55,7 @@
             <label for="sender_mail">กระทรวง</label>
             <div class=" d-flex bd-highlight">
                 <div class="w-100 bd-highlight">
-                    <select class="form-select " aria-label="Default select example"
+                    <select class="form-select form-select-lg" aria-label="Default select example"
                             name="select_ministry">
                         {% for ministry in ministry %}
                             <option value={{ ministry }}>{{ ministry }}</option>
@@ -63,13 +63,13 @@
                     </select>
                 </div>
                 <div class="mx-2 flex-shrink-1 bd-highlight">
-                    <button type="button" class="btn btn-danger " name="btn_delete_ministry" id="btn_delete_ministry" onclick="delete_btn('ministry')"
+                    <button type="button" class="btn btn-danger btn-lg" name="btn_delete_ministry" id="btn_delete_ministry" onclick="delete_btn('ministry')"
                             {% if ministry %}{% else %}disabled{% endif %}>
                         ลบ
                     </button>
                 </div>
                 <div class="flex-shrink-1 bd-highlight">
-                    <button type="button" class="btn btn-success " data-bs-toggle="modal"
+                    <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal"
                             data-bs-target="#add_ministry">
                         เพิ่ม
                     </button>
@@ -83,7 +83,7 @@
             <label for="delete_date">เลือกเวลาลบไฟล์</label>
             <div class=" d-flex bd-highlight">
                 <div class="w-100 bd-highlight">
-                    <select class="form-select mb-3" aria-label="Default select example"
+                    <select class="form-select mb-3 form-select-lg" aria-label="Default select example"
                             name="delete_date"
                             id="delete_date"
                             {% if not form_configuration.delete_date_status %}style="pointer-events: none;background-color: darkgray" {% endif %}>
@@ -97,9 +97,9 @@
                 </div>
                 <div class="ms-2 flex-shrink-1 bd-highlight">
                     {% if form_configuration.delete_date_status %}
-                        <button type="submit" class="btn btn-success" name="is_delete">เปิด</button>
+                        <button type="submit" class="btn btn-success btn-lg" name="is_delete">ปิด</button>
                     {% else %}
-                        <button type="submit" class="btn btn-outline-secondary " name="is_delete">ปิด</button>
+                        <button type="submit" class="btn btn-outline-secondary btn-lg" name="is_delete">เปิด</button>
                     {% endif %}
                 </div>
             </div>
@@ -107,7 +107,7 @@
             <label for="sent_mail_date">เลือกเวลาส่งอีเมล</label>
             <div class=" d-flex bd-highlight">
                 <div class="w-100 bd-highlight">
-                    <select class="form-select mb-3" aria-label="Default select example"
+                    <select class="form-select mb-3 form-select-lg" aria-label="Default select example"
                             name="send_mail_date"
                             id="send_mail_date" {% if not form_configuration.sender_mail_status %}
                             style="pointer-events: none;background-color: darkgray" {% endif %}>
@@ -120,9 +120,9 @@
                 </div>
                 <div class="ms-2 flex-shrink-1 bd-highlight">
                     {% if form_configuration.sender_mail_status %}
-                        <button type="submit" class="btn btn-success " name="is_send">เปิด</button>
+                        <button type="submit" class="btn btn-success btn-lg" name="is_send">ปิด</button>
                     {% else %}
-                        <button type="submit" class="btn btn-outline-secondary " name="is_send">ปิด</button>
+                        <button type="submit" class="btn btn-outline-secondary btn-lg" name="is_send">เปิด</button>
                     {% endif %}
 
                 </div>
@@ -141,10 +141,10 @@
 
 
             <label for="sender_mail">อีมลผู้ส่ง</label>
-            <input class="form-control mb-3" type="email" placeholder="example@mail.com" aria-label=""
+            <input class="form-control mb-3 form-control-lg" type="email" placeholder="example@mail.com" aria-label=""
                    name="sender_mail" id="sender_mail"
                    {% if form_configuration.sender_mail %}value="{{ form_configuration.sender_mail }}" {% else %}{% endif %}>
-            <button type="submit" class="mt-2 btn btn-success ">บันทึก</button>
+            <button type="submit" class="mt-2 btn btn-success btn-lg">บันทึก</button>
         </form>
     </div>
 
@@ -156,14 +156,14 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">เพิ่มจังหวัด</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-lg" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <input class="form-control form-control-lg" type="text" name="add_province" autocomplete="off">
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
-                        <button type="submit" class="btn btn-primary">ยืนยัน</button>
+                        <button type="button" class="btn btn-secondary btn-lg" data-bs-dismiss="modal">ปิด</button>
+                        <button type="submit" class="btn btn-primary btn-lg">ยืนยัน</button>
                     </div>
                 </div>
             </div>
@@ -180,14 +180,14 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">เพิ่มกระทรวง</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-lg" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <input class="form-control form-control-lg" type="text" name="add_ministry" autocomplete="off">
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
-                        <button type="submit" class="btn btn-primary">บันทึก</button>
+                        <button type="button" class="btn btn-secondary btn-lg" data-bs-dismiss="modal">ปิด</button>
+                        <button type="submit" class="btn btn-primary btn-lg">บันทึก</button>
                     </div>
                 </div>
             </div>
@@ -196,14 +196,15 @@
 
     <script>
         function delete_btn(item) {
+            console.log(item)
             Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
+                title: `ต้องการจะลบหรือไม่`,
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
+                confirmButtonColor: '#198754',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: 'ยืนยัน',
+                cancelButtonText: 'ยกเลิก'
             }).then((result) => {
                 if (result.isConfirmed) {
                     if(item == 'province'){

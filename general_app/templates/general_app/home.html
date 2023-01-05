@@ -13,7 +13,15 @@
             </button>
         </form>
     </div>
+    <style>
+        .select2-container .select2-selection--single {
+            width: 200px;
+        }
 
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            font-size: 20px;
+        }
+    </style>
     {% for message in messages %}
         {% if message.message == "uploaded file" %}
             <script>
@@ -122,37 +130,26 @@
 
 
 
-
     {% endfor %}
-
+    {{ request.session.user }}
     {#search#}
     {% if request.user.is_superuser %}
-        {{ users }}
         <form action="{% url 'home' %}" method="get">
             <div class="d-flex justify-content-center flex-wrap" style="margin-top: 30px">
                 <div class="input-group w-25" style="font-size: 27px;height: 50px">
-                    <select class="js-example-basic-multiple form-control form-control-lg" style="" name="states[]"
-                            multiple="multiple">
+                    <select class="js-example-basic-multiple form-control form-control-lg"
+                            name="searched"
+                            multiple="multiple" id="searched_select">
                         {% for user in users %}
                             <option value="{{ user }}">{{ user }}</option>
                         {% endfor %}
+                        {% if searched %}
+                            {% for search in searched %}
+                                <option value="{{ search }}" selected>{{ search }}</option>
+                            {% endfor %}
+                        {% endif %}
                     </select>
                 </div>
-
-                {#                <input type="search" class="form-control form-control-lg w-25" placeholder="ค้นหา..."#}
-                {#                       aria-label="Search" name="searched" list="datalist_search" autocomplete="off"#}
-                {#                       aria-describedby="search-addon" {% if searched %} value="{{ searched }}" {% endif %} />#}
-                {#                <datalist id="datalist_search">#}
-                {#                    {% for user in users %}#}
-                {#                        <option value="{{ user }}"></option>#}
-                {#                    {% endfor %}#}
-                {#                </datalist>#}
-
-
-                {#            date#}
-                {#                <input type="month" name="date_filter" class="ms-2" {% if date_filter %}#}
-                {#                       value="{{ date_filter }}" {% else %}{% endif %}>#}
-                {#            date#}
                 <button type="submit" class="mx-2 btn btn-outline-success btn-lg">
                     {% bs_icon 'search' %}
                 </button>
@@ -166,9 +163,9 @@
     {% endif %}
 
 
-    <div class="d-flex justify-content-center flex-wrap ">
+    <div class="d-flex justify-content-center flex-wrap mt-5">
         <div class="p-2 flex-grow-2 bd-highlight w-75 table-responsive">
-            <table class="table table-lg table-hover ">
+            <table class="table table-lg table-hover">
                 <thead>
                 <tr style="font-size: 20px">
                     <th scope="col">ลำดับที่</th>
@@ -176,27 +173,27 @@
                         <th scope="col">โรงพยาบาล</th>
                     {% endif %}
                     <th scope="col">ไฟล์</th>
-                    <th scope="col">วันที่</th>
+                    <th scope="col" style="width: 25%">วันที่</th>
                     {% if request.user.is_superuser %}
                         <th scope="col"></th>
                     {% endif %}
                 </tr>
                 </thead>
-                <tbody>
+                <tbody style="font-size: 18px">
                 <div class="container" onclick="location.href='{{ cert.cert.url }}';">
                     {% for cert,cert_date in certs %}
                         <tr>
                             <th scope="row">{{ forloop.counter }}</th>
                             {% if request.user.is_superuser %}
-                                <td style="font-size: 18px">{{ cert.hospital }}{{ cert.hospital_id }}
+                                <td style="font-size: 18px">{{ cert.hospital }}
                                 </td>
                             {% endif %}
                             <td><a href="{{ cert.cert.url }}"
-                                   onclick="window.location.replace('{% url 'home' cert.hospital_id %}');"
+                                   onclick="window.location.replace('{% url 'home' cert.id %}');"
                                    target="_blank">ดาวโหลดไฟล์คลิกที่นี้</a></td>
 
                             {#                                    <td>{{ cert.create_date|date:"D d M Y" }}</td>#}
-                            <td style="width: 15%">{{ cert_date }}</td>
+                            <td>{{ cert_date }}</td>
                             {% if request.user.is_superuser %}
                                 <td>
                                     <button type="button" name="delete_record" onclick="delete_rec({{ cert.id }})"
@@ -225,7 +222,7 @@
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">เพิ่มอีเมล</h5>
+                            <h5 class="modal-title" id="exampleModalLabel">เพิ่มข้อมูล</h5>
                             <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"
                                     onclick="javascript:window.location.reload()">
                                 <span aria-hidden="true">&times;</span>
@@ -307,47 +304,35 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">อัปโหลดใบรับรองดิจิทัล</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     {#upload#}
-                    <form action="{% url 'home' %}" method="post" enctype="multipart/form-data"
-                          onsubmit="submit_file.disabled = true; return true;">
+                    <form action="{% url 'home' %}" method="post" enctype="multipart/form-data" onsubmit="submit_file.disabled = true; return true;">
                         {% csrf_token %}
-                        <div class="d-flex justify-content-center flex-wrap mb-3" style="margin-top: 25px">
-
-
-                            <div class="input-group ">
-                                {#                        <select class="js-example-basic-multiple form-control form-control-lg" name="states[]"#}
-                                {#                                multiple="multiple">#}
-                                <div class="selection2_name" >
-                                    {{ certform.hospital }}
-                                </div>
-                                {#                            {% for user in users %}#}
-                                {#                                <option value="{{ uesr }}">{{ user }}</option>#}
-                                {#                            {% endfor %}#}
-                                {#                        </select>#}
-                                <div class="w-50">
-                                    {{ certform.cert }}
-                                </div>
+                        <div class="d-flex justify-content-center flex-wrap ">
+                            {#                        <select class="js-example-basic-multiple form-control form-control-lg" name="states[]"#}
+                            {#                                multiple="multiple">#}
+                            <div class="selection2_name p-2">
+                                {{ certform.hospital }}
                             </div>
-
-                            <div class="p-1">
-
-                                {#                    <input class="form-control form-control-lg " type="file" required name="cert_file">#}
+                            {#                            {% for user in users %}#}
+                            {#                                <option value="{{ uesr }}">{{ user }}</option>#}
+                            {#                            {% endfor %}#}
+                            {#                        </select>#}
+                            <div class="w-50 p-2" id="div_upload">
+                                {{ certform.cert }}
                             </div>
-                            <div class="btn-group btn-group-lg p-1" role="group" aria-label="...">
-                                <button type="submit" class="btn btn-outline-success " role="group" id="submit_file"
+                            <div id="div_upload_btn" class="p-2">
+                                <button type="submit" class="btn btn-outline-success btn-lg" role="group"
+                                        id="submit_file"
                                         name="submit_files">อัปโหลด
                                 </button>
                             </div>
+
                         </div>
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
                 </div>
             </div>
         </div>
@@ -357,17 +342,67 @@
 
 
 
-    <script src="{% static 'designer/js/jquery.cookie.js' %}"></script>
 
 
     <script>
+
+        document.getElementById("div_upload").style.display = "none"
+        document.getElementById("div_upload_btn").style.display = "none"
         console.log('select2');
         $('#mySelect2').select2({
             dropdownParent: $('#add_cert')
         });
+
+        $('#upload_input').change(function () {
+            if (document.getElementById("upload_input").files.length == 0) {
+                document.getElementById("div_upload_btn").style.display = "none"
+            } else {
+                console.log('else')
+                document.getElementById("div_upload_btn").style.display = "block"
+            }
+        })
+
+        $('#mySelect2').change(function () {
+            var val = $("#mySelect2 option:selected").text();
+            if (val != '---------') {
+                console.log('val if', val);
+                document.getElementById("div_upload").style.display = "block"
+
+            } else {
+                console.log('val else', val);
+                document.getElementById("div_upload").style.display = "none"
+                document.getElementById("div_upload_btn").style.display = "none"
+            }
+        });
     </script>
 
 
+
+
+    <script>
+
+
+        $('#submit_file').on('click', function (e) {
+            console.log(e)
+            e.preventDefault();
+            var selected = $("#mySelect2 option:selected").text();
+            var file = document.getElementById("upload_input").files[0].name;
+            var form = $(this).parents('form');
+            swal.fire({
+                title: "ยืนยันการอัปโหลด",
+                text: `ต้องการที่อัปโหลด ${file} ให้กับ ${selected}`,
+                showCancelButton: true,
+                confirmButtonColor: "#198754",
+                confirmButtonText: "ยืนยัน",
+                cancelButtonColor: '#BB2D3B',
+                cancelButtonText: 'ยกเลิก',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit()
+                }
+            })
+        });
+    </script>
 
     <script>
 
@@ -377,7 +412,7 @@
                 title: 'ต้องการจะลบเอกสารนี้หรือไม่',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
+                confirmButtonColor: '#198754',
                 cancelButtonColor: '#d33',
                 cancelButtonText: 'ยกเลิก',
                 confirmButtonText: 'ยืนยัน'

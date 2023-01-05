@@ -6,38 +6,77 @@
         {{ form_user.non_field_errors }}
         {{ form_auth.non_field_errors }}
         {% csrf_token %}
+
         <div class="container">
-            <div class="m-3">
-                <label for="email_address" class="form-label">อีเมล</label>
-                {{ form_auth.email.errors }}
-                {{ form_auth.email }}
-            </div>
-            <div class="m-3">
-                <label for="address" class="form-label">ที่อยู่</label>
-                {#            <textarea class="form-control" id="address" rows="3" id="address" placeholder="185/19  ขอนแก่น"></textarea>#}
-                {{ form_user.address.errors }}
-                {{ form_user.address }}
-            </div>
-            <div class="m-3">
-                <label for="province" class="form-label">จังหวัด</label>
-                {{ form_user.province.errors }}
-                {{ form_user.province }}
-            </div>
-            <div class="m-3">
-                <label for="ministry" class="form-label">กระทรวง</label>
-                {#            <input type="email" class="form-control" id="ministry" placeholder="กระทรวงสาธารณสุข">#}
-                {{ form_user.ministry.errors }}
-                {{ form_user.ministry }}
-            </div>
-            <div class="m-3">
-                <label for="code" class="form-label">รหัส</label>
-                {#            <input type="email" class="form-control" id="code" placeholder="1234567">#}
-                {{ form_user.code.errors }}
-                {{ form_user.code }}
-            </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="m-3">
+                            <label for="address" class="form-label">ที่อยู่</label>
+                            {#            <textarea class="form-control" id="address" rows="3" id="address" placeholder="185/19  ขอนแก่น"></textarea>#}
+                            {{ form_user.address.errors }}
+                            {{ form_user.address }}
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="m-3">
+                                    <label for="province" class="form-label">จังหวัด</label>
+                                    {{ form_user.province.errors }}
+                                    {{ form_user.province }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="m-3">
+                                    <label for="ministry" class="form-label">กระทรวง</label>
+                                    {#            <input type="email" class="form-control" id="ministry" placeholder="กระทรวงสาธารณสุข">#}
+                                    {{ form_user.ministry.errors }}
+                                    {{ form_user.ministry }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="m-3">
+                            <label for="code" class="form-label">รหัส</label>
+                            {#            <input type="email" class="form-control" id="code" placeholder="1234567">#}
+                            {{ form_user.code.errors }}
+                            {{ form_user.code }}
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="m-3">
+                            <label for="email_address" class="form-label">อีเมล</label>
+                            {{ form_auth.email.errors }}
+                            {{ form_auth.email }}
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="m-3">
+                                    <label class="form-label">ชื่อ</label>
+                                    <input name="first_name" class="form-control"
+                                           value="{{ user_information.user.first_name }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="m-3">
+                                    <label class="form-label">นามสกุล</label>
+                                    <input name="last_name" class="form-control"
+                                           value="{{ user_information.user.last_name }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="m-3">
+                            <label class="form-label">ตำแหน่ง</label>
+                            <input name="position" class="form-control" type="text"
+                                   value="
+
+
+                                           {% if user_information.detail.position %}{{ user.detail.position }}{% endif %}">
+                        </div>
+
+                    </div>
+                </div>
             <div class="m-3">
                 <button type="submit" class="btn btn-primary">บันทึก</button>
-                <a class='mx-3' href="{% url 'password_change' %}">เปลี่ยนรหัสผ่าน</a>
+                <a class='mx-3' href="{% url 'change_password' %}">เปลี่ยนรหัสผ่าน</a>
             </div>
         </div>
     </form>

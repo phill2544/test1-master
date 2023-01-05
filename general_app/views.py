@@ -2,6 +2,7 @@ import datetime
 import json
 from datetime import date
 
+from django.core import serializers
 from django.template import Template, Context
 from reportlab.lib import colors
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
@@ -39,31 +40,67 @@ from reportlab.pdfbase.ttfonts import TTFont
 from django.contrib.staticfiles import finders
 
 
-def month(month):
+def month(month, short=None):
     if month == 1:
-        return "มกราคม"
+        if short:
+            return "ม.ค."
+        else:
+            return "มกราคม"
     elif month == 2:
-        return "กุมภาพันธ์ "
+        if short:
+            return "ก.พ."
+        else:
+            return "กุมภาพันธ์ "
     elif month == 3:
-        return "มีนาคม"
+        if short:
+            return "มี.ค."
+        else:
+            return "มีนาคม"
     elif month == 4:
-        return "เมษายน"
+        if short:
+            return "เม.ย."
+        else:
+            return "เมษายน"
     elif month == 5:
-        return "พฤษภาคม"
+        if short:
+            return "พ.ค."
+        else:
+            return "พฤษภาคม"
     elif month == 6:
-        return "มิถุนายน"
+        if short:
+            return "มิ.ย."
+        else:
+            return "มิถุนายน"
     elif month == 7:
-        return "กรกฎาคม"
+        if short:
+            return "ก.ค."
+        else:
+            return "กรกฎาคม"
     elif month == 8:
-        return "สิงหาคม"
+        if short:
+            return "ส.ค."
+        else:
+            return "สิงหาคม"
     elif month == 9:
-        return "กันยายน"
+        if short:
+            return "ก.ย."
+        else:
+            return "กันยายน"
     elif month == 10:
-        return "ตุลาคม"
+        if short:
+            return "ต.ค."
+        else:
+            return "ตุลาคม"
     elif month == 11:
-        return "พฤศจิกายน"
+        if short:
+            return "พ.ย."
+        else:
+            return "พฤศจิกายน"
     else:
-        return "ธันวาคม"
+        if short:
+            return "ธ.ค."
+        else:
+            return "ธันวาคม"
 
 
 def date_th(result):
@@ -75,7 +112,7 @@ def date_th(result):
     except:
         cert_date.append('{} {} {}'.format(result.create_date.day, month(result.create_date.month),
                                            result.create_date.year + 543))
-    return cert_date;
+    return cert_date
 
 
 def delete_file():
@@ -154,7 +191,97 @@ def send_email():
 #     return response
 
 
-def create_pdf(request):
+# def create_pdf(request):
+#
+#     elems = []
+#     data = []
+#     response = HttpResponse(content_type='application/pdf')
+#     response['Content-Disposition'] = 'attachment; filename="table.pdf"'
+#
+#     buffer = BytesIO()
+#     doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=5,
+#                             leftMargin=5,
+#                             topMargin=5,
+#                             bottomMargin=5)
+#     #
+#     # pdf = SimpleDocTemplate(
+#     #     'mypdf.pdf',
+#     #     pagesize=letter,
+#     # )
+#     pdfmetrics.registerFont(TTFont('THSarabun', 'general_app/THSarabunNew.ttf'))
+#     pdfmetrics.registerFont(TTFont('THSarabunB', 'general_app/THSarabunNew Bold.ttf'))
+#     #
+#     # header = [
+#     #     Spacer(1, 5 * cm),
+#     #     Paragraph('ศูนย์สนับสนุนบริการสุขภาพที่',ParagraphStyle('test',fontName='general_app/THSarabunNew.ttf')),
+#     #     Spacer(1, 5 * cm),
+#     # ]
+#     data += [
+#         # header,
+#         # ['', 'ศูนย์สนับสนุนบริการสุขภาพที่ 7', ''],
+#         ['อัปโหลดแล้ว', '{}/{}'.format(User_Detail.objects.filter(is_upload=True).count(), User.objects.all().count())],
+#         ['ดาวโหลดแล้ว',
+#          '{}/{}'.format(CertificateFile.objects.filter(count_download__gt=0).count(), User.objects.all().count())],
+#         ['', '', ''],
+#         ['โรงพยาบาล', 'วันที่อัปโหลด', 'จำนวนการดาวโหลด'],
+#     ]
+#
+#     for user in User.objects.all():
+#         if User_Detail.objects.get(user_id=user.id).is_upload:
+#             # if not CertificateFile.objects.filter(hospital_id=user.id).order_by('-create_date'):
+#             #     upload = ''
+#             #     count_download = 0
+#             # else:
+#             upload = CertificateFile.objects.filter(hospital_id=user.id).order_by('-create_date')[0]
+#             count_download = upload.count_download
+#             upload = upload.create_date + relativedelta(years=543)
+#         else:
+#             upload = ''
+#             count_download = ''
+#         try:
+#             date_upload = '{} {} {}'.format(upload.day, month(int(upload.month), True), upload.year)
+#         except:
+#             date_upload = ''
+#         data += [
+#             ['{}'.format(user.username),
+#              date_upload,
+#              '{}'.format(count_download)]
+#         ]
+#
+#     # obj = {User.objects.all()}
+#     # pdf.drawString(2 * cm, 27 * cm, str(obj))
+#     table = Table(data, colWidths=6 * cm, rowHeights=1 * cm, vAlign='TOP', )
+#     table.setStyle(TableStyle([
+#         ('FONT', (0, 0), (1, 1), 'THSarabun'),
+#         ('FONTSIZE', (0, 0), (1, 1), 20),
+#         ('FONT', (0, 3), (2, 3), 'THSarabunB'),
+#         ('FONTSIZE', (0, 3), (2, 3), 20),  # header
+#         ('FONT', (0, 4), (-1, -1), 'THSarabun'),
+#         ('FONTSIZE', (0, 4), (-1, -1), 20),
+#         # ('FONTSIZE', (0, 0), (-1, 0), 50),
+#         # ('BOX', (0, 3), (-1, -1), 1, (0, 0, 0)),
+#         ('BOX', (0, 0), (1, 1), 1, (0, 0, 0)),  # box in content
+#         ('INNERGRID', (0, 0), (1, 1), 0.25, colors.black),
+#         ('LINEBELOW', (0, 3), (-1, -1), 0.5, colors.black),
+#         # ('TEXTCOLOR', (0, 0), (-1, 0), colors.red),
+#         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+#         ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+#         # ('LINEBEFORE', (0, 0), (1,1), 2, colors.black),
+#         # ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+#     ]))
+#     elems = [table]
+#     # Save the PDF
+#     doc.build(elems)
+#     # pdf.save()
+#
+#     pdf = buffer.getvalue()
+#     buffer.close()
+#     response.write(pdf)
+#
+#     return response
+
+
+def create_pdf(datas):
     elems = []
     data = []
     response = HttpResponse(content_type='application/pdf')
@@ -187,20 +314,28 @@ def create_pdf(request):
         ['', '', ''],
         ['โรงพยาบาล', 'วันที่อัปโหลด', 'จำนวนการดาวโหลด'],
     ]
-    for user in User.objects.all():
-        if User_Detail.objects.get(user_id=user.id).is_upload:
-            # if not CertificateFile.objects.filter(hospital_id=user.id).order_by('-create_date'):
-            #     upload = ''
-            #     count_download = 0
-            # else:
-            upload = CertificateFile.objects.filter(hospital_id=user.id).order_by('-create_date')[0]
-            count_download = upload.count_download
-            upload = upload.create_date
-        else:
-            upload = ''
-            count_download = ''
+
+    # for user in User.objects.all():
+    #     if User_Detail.objects.get(user_id=user.id).is_upload:
+    #         # if not CertificateFile.objects.filter(hospital_id=user.id).order_by('-create_date'):
+    #         #     upload = ''
+    #         #     count_download = 0
+    #         # else:
+    #         upload = CertificateFile.objects.filter(hospital_id=user.id).order_by('-create_date')[0]
+    #         count_download = upload.count_download
+    #         upload = upload.create_date + relativedelta(years=543)
+    #     else:
+    #         upload = ''
+    #         count_download = ''
+    #     try:
+    #         date_upload = '{} {} {}'.format(upload.day, month(int(upload.month), True), upload.year)
+    #     except:
+    #         date_upload = ''
+    for count, item in datas.items():
         data += [
-            ['{}'.format(user.username), '{}'.format(upload), '{}'.format(count_download)]
+            [item['hospital'],
+             item['upload_date'],
+             item['count_download']]
         ]
 
     # obj = {User.objects.all()}
@@ -232,16 +367,11 @@ def create_pdf(request):
     pdf = buffer.getvalue()
     buffer.close()
     response.write(pdf)
-
     return response
-
-
-#
 
 
 @login_required
 def home(request, hospital_id=None):
-    print('HOME')
     try:
         certform = CertificateForm(request.POST, request.FILES)
     except:
@@ -268,14 +398,15 @@ def home(request, hospital_id=None):
             number = request.POST['number']
             email_authen = request.POST['email']
             email_valid = request.POST['email_valid']
-            user_detail = User_Detail.objects.get(user_id=request.user.id)
             if email_authen == email_valid:
+                User_Detail.objects.filter(user_id=request.user.id).update(position=position, number=number)
                 name_split = str(name).split()
                 user.email = email_authen
                 user.first_name = name_split[0]
                 user.last_name = name_split[1]
-                user_detail.position = position
-                user_detail.number = number
+                # user_detail[0].position = position
+                # user_detail[0].number = number
+                # user_detail[0].save()
                 user.save()
                 messages.success(request, 'email success')
             else:
@@ -305,40 +436,42 @@ def home(request, hospital_id=None):
 
     elif 'searched' in request.GET or 'date_filter' in request.GET:  # and request.GET['searched'] is not ''
         result = []
-        searched = request.GET['searched'] if request.GET['searched'] else ''
-        date_filters = request.GET['date_filter'] if request.GET['date_filter'] else ''
-        date_filter = date_filters.split('-') if date_filters else ''
+        searched = request.GET.getlist('searched') if request.GET.getlist('searched') else ''
+        # date_filters = request.GET['date_filter'] if request.GET['date_filter'] else ''
+        # date_filter = date_filters.split('-') if date_filters else ''
         # result = CertificateFile.objects.filter(create_date__month=date_filter[1], create_date__year=date_filter[0])
         try:
             username_id = User.objects.get(username__contains=searched).id
             certs = CertificateFile.objects.filter(hospital_id=username_id)
         except:
-            username_id = User.objects.filter(username__contains=searched)
+            username_id = User.objects.filter(username__in=searched)
             certs = CertificateFile.objects.filter(hospital_id__in=username_id)
-        if date_filter != '':
-            for cert in certs:
-                if cert.create_date.month == int(date_filter[1]) and cert.create_date.year == int(date_filter[0]):
-                    result.append(cert)
-            cert_date = date_th(result)
-            return render(request, 'general_app/home.html',
-                          {'searched': searched, 'certs': zip(result, cert_date), 'certform': certform,
-                           'date_filter': date_filters, 'users': users})
-        # cert_date = date_th(search_cert)
-        # return render(request, 'general_app/home.html',
-        #               {'searched': searched, 'certs': zip(search_cert, cert_date), 'certform': certform,
-        #                'users': users})
+        # if date_filter != '':
+        #     for cert in certs:
+        #         if cert.create_date.month == int(date_filter[1]) and cert.create_date.year == int(date_filter[0]):
+        #             result.append(cert)
+        #     cert_date = date_th(result)
+        #     return render(request, 'general_app/home.html',
+        #                   {'searched': searched, 'certs': zip(result, cert_date), 'certform': certform,
+        #                    'date_filter': date_filters, 'users': users})
+        cert_date = date_th(certs)
+        return render(request, 'general_app/home.html',
+                      {'searched': searched, 'certs': zip(certs, cert_date), 'certform': certform, 'users': users})
     elif 'date_filter' in request.GET:
         date_filter = request.GET['date_filter'].split('-')
         result = CertificateFile.objects.filter(create_date__month=date_filter[1], create_date__year=date_filter[0])
         cert_date = date_th(result)
         return render(request, 'general_app/home.html',
                       {'certs': zip(result, cert_date), 'certform': certform})
-    elif hospital_id != None and not request.user.is_superuser:
-        print('hahaha test')
-        count_download = CertificateFile.objects.get(hospital_id=hospital_id).count_download + 1
-        CertificateFile.objects.filter(hospital_id=hospital_id).update(count_download=count_download)
+    elif hospital_id != None:
+        if not request.user.is_superuser:
+            print('hahaha test')
+            count_download = CertificateFile.objects.get(pk=hospital_id).count_download + 1
+            CertificateFile.objects.filter(pk=hospital_id).update(count_download=count_download)
+            return HttpResponseRedirect(reverse('home'))
+        else :
+            return HttpResponseRedirect(reverse('home'))
     cert_date = date_th(certs)
-
     context = {'certs': zip(certs, cert_date), 'email_authen': email_authen, 'email_valid': email_valid,
                'users': users, 'certform': certform, 'searched': searched}
     return render(request, 'general_app/home.html', context)
@@ -373,7 +506,11 @@ def profile(request):
             form_user = User_DetailForm()
     context = {
         'form_user': form_user,
-        'form_auth': form_auth
+        'form_auth': form_auth,
+        'user_information': {
+            'user': User.objects.get(id=request.user.id),
+            'detail': User_Detail.objects.get(user_id=request.user.id)
+        }
     }
 
     return render(request, 'general_app/profile.html', context)
@@ -401,9 +538,11 @@ def configuration(request):
         elif 'is_send' in request.POST:
             form_configuration.sender_mail_status = not form_configuration.sender_mail_status
             form_configuration.save()
+            return HttpResponseRedirect(reverse('configuration'))
         elif 'is_delete' in request.POST:
             form_configuration.delete_date_status = not form_configuration.delete_date_status
             form_configuration.save()
+            return HttpResponseRedirect(reverse('configuration'))
         else:
             config = Configuration.objects.get(pk=1)
             config.send_mail_date = request.POST['send_mail_date']
@@ -427,9 +566,11 @@ def manage_user(request):
         form_user_detail = User_DetailForm(request.POST)
         form_user_creation = UserCreationForm(request.POST)
         date = request.POST['cal_date']
-        cal_date = '{}-{}-{}'.format([str(date).split('/')[2]-543 , str(date).split('/')[1],str(date).split('/')[0]])
+        # cal_date = request.POST['cal_date']
+        cal_date = '{}-{}-{}'.format(int(str(date).split('-')[2]) - 543, str(date).split('-')[1],
+                                     str(date).split('-')[0])
         if form_user_creation.data['password'] == form_user_creation.data['confirm_password']:
-            if form_user_detail.is_valid():
+            if form_user_detail:
                 form_user_creation = User.objects.create_user(request.POST['username'], request.POST['email'],
                                                               request.POST['password'],
                                                               is_superuser=request.POST['is_superuser'])
@@ -437,7 +578,9 @@ def manage_user(request):
                                                               address=request.POST['address'],
                                                               ministry_id=request.POST['ministry'],
                                                               cal_date=str(cal_date),
-                                                              user_id=form_user_creation.id, code=request.POST['code'])
+                                                              user_id=form_user_creation.id,
+                                                              code=request.POST['code'],
+                                                              password=request.POST['password'])
                 form_user_creation.save()
                 form_user_detail.save()
                 form_user_detail = User_DetailForm()
@@ -476,34 +619,50 @@ def edit_user(request, pk):
         form_user_detail = User_DetailForm(request.POST, instance=User_Detail.objects.get(user_id=name.user_id))
         user = User.objects.filter(id=pk)
         form_user = UserProfileForm(request.POST, instance=User.objects.get(id=name.user_id))
-        if form_user_detail.is_valid():
-            form_user_detail.save()
-            user.update(email=request.POST['email'])
-            return HttpResponseRedirect(reverse('manage_user'))
-            # return HttpResponseRedirect(reverse('manage_user'))
+        cal_date = form_user.data['cal_date'].split('-')
+        User_Detail.objects.filter(user_id=pk).update(province_id=form_user_detail.data['province'],
+                                                      ministry_id=form_user_detail.data['ministry'],
+                                                      code=form_user_detail.data['code'],
+                                                      address=form_user_detail.data['address'],
+                                                      cal_date='{}-{}-{}'.format(str(int(cal_date[2]) - 543),
+                                                                                 cal_date[1], cal_date[0]),
+                                                      position=request.POST['position'])
+        User.objects.filter(id=pk).update(email=form_user_detail.data['email'], first_name=request.POST['first_name'],
+                                          last_name=request.POST['last_name'])
+        user.update(email=request.POST['email'])
+        return HttpResponseRedirect(reverse('manage_user'))
+        # return HttpResponseRedirect(reverse('manage_user'))
     try:
         form_user_detail = User_DetailForm(instance=User_Detail.objects.get(user_id=pk))
+        form_user_detail.initial.update(cal_date=datetime.date(User_Detail.objects.get(user_id=pk).cal_date.year + 543,
+                                                               User_Detail.objects.get(user_id=pk).cal_date.month,
+                                                               User_Detail.objects.get(user_id=pk).cal_date.day))
         form_user = UserProfileForm(instance=User.objects.get(id=pk))
+        user_information = {
+            'user': User.objects.get(id=pk),
+            'detail': User_Detail.objects.get(user_id=pk)
+        }
     except:
         return render(request, 'general_app/manage_users.html',
                       context={'detail_modal': True, 'users': users, 'form_user': None, 'name': name,
-                               'form_user_email': None})
+                               'form_user_email': None, 'user_information': user_information})
     context = {'detail_modal': True, 'users': users, 'form_user': form_user_detail, 'name': name,
-               'form_user_email': form_user}
+               'form_user_email': form_user, 'user_information': user_information}
     return render(request, 'general_app/manage_users.html', context)
 
 
 @login_required
 def delete_record(request, pk):
     id_user = CertificateFile.objects.get(id=pk).hospital_id
-    print(User_Detail.objects.get(user_id=id_user).is_upload)
+    # print(User_Detail.objects.get(user_id=id_user).is_upload)
     User_Detail.objects.filter(user_id=id_user).update(is_upload=False)
-    print(User_Detail.objects.get(user_id=id_user).is_upload)
+    # print(User_Detail.objects.get(user_id=id_user).is_upload)
     CertificateFile.objects.filter(id=pk).delete()
     # User_Detail.objects.filter(user_id=request.user.id).update(is_upload=False)
     return HttpResponseRedirect(reverse('home'))
 
 
+@login_required
 def delete_user(request, name):
     id = User.objects.get(username=name).id
     try:
@@ -514,34 +673,97 @@ def delete_user(request, name):
         return HttpResponseRedirect(reverse('manage_user'))
 
 
+@login_required
 def dashboard(request):
     data = {}
+    cert_id = []
     count = 0
-    for user in User.objects.all():
-        if User_Detail.objects.get(user_id=user.id).is_upload:
-            upload = CertificateFile.objects.filter(hospital_id=user.id).order_by('-create_date')[0]
-            count_download = upload.count_download
-            upload = date_th(upload)[0]
-
-        else:
-            upload = ''
-            count_download = ''
-        data[count] = {'hospital': user, 'count_download': count_download, 'upload_date': upload}
-        count += 1
-    print(data)
-    print(User.objects.all())
+    users = None
+    count_user = 0
+    check_box = None
+    try:
+        search = request.GET.getlist('search_users')
+    except:
+        search = None
+    date_range_default_start = datetime.datetime(int(datetime.datetime.now().year) + 543, datetime.datetime.now().month,
+                                                 datetime.datetime.now().day).strftime("%m/%d/%Y")  # for date_range
+    date_range_default_end = datetime.datetime(int(datetime.datetime.now().year) + 543, datetime.datetime.now().month,
+                                               datetime.datetime.now().day).strftime("%m/%d/%Y")  # for date_range
+    # if 'daterange' in request.GET:
+    try:
+        date_range = str(request.GET['daterange']).split('-')
+        date_range_default_start = date_range[0]
+        date_range_default_end = date_range[1]
+        date_start = datetime.date(int(str(date_range[0]).split('/')[2]) - 543, int(str(date_range[0]).split('/')[0]),
+                                   int(str(date_range[0]).split('/')[1]))
+        date_end = datetime.date(int(str(date_range[1]).split('/')[2]) - 543, int(str(date_range[1]).split('/')[0]),
+                                 int(str(date_range[1]).split('/')[1]))
+    except:
+        date_start = datetime.date.today()
+        date_end = datetime.date.today()
+    if not 'search_users' in request.GET and not (date_start != date_end):
+        data = fecth_report(User.objects.all())
+    elif 'search_users' in request.GET and not (date_start != date_end):
+        data = fecth_report(User.objects.filter(username__in=request.GET.getlist('search_users')))
+    elif date_start != date_end and not 'search_users' in request.GET:
+        # search = User.objects.filter(username__in=request.GET.getlist('search_users'))
+        data = fecth_report(CertificateFile.objects.filter(create_date__range=[str(date_start), str(date_end)]))
+    elif date_start != date_end and 'search_users' in request.GET:
+        id = User.objects.filter(username__in=request.GET.getlist('search_users')).values_list('id')
+        data = fecth_report(
+            CertificateFile.objects.filter(hospital_id__in=id).filter(create_date__range=[date_start, date_end]))
+    # if 'search_users' in request.GET :
+    #     search = User.objects.filter(username__in=request.GET.getlist('search_users'))
+    #     if 'daterange' in request.GET and (date_start != datetime.date.today() or date_end != datetime.date.today() ):
+    #         search = users
+    #
+    # elif not 'search_users' in request.GET:
+    #     data = fecth_report(User.objects.all())
+    if 'is_upload' in request.GET:
+        new_data = {}
+        for obj in data:
+            if data[obj]['upload_date'] != '':
+                new_data[obj] = data[obj]
+        data = new_data
+        check_box = 'checked'
+    if 'pdf' in request.GET:
+        respone = create_pdf(data)
+        return respone
     context = {
         'data': data,
-        'users': User.objects.all()
+        'users': User.objects.all(),
+        'date_range_default_start': date_range_default_start,
+        'date_range_default_end': date_range_default_end,
+        'searched': search,
+        'check_box': check_box
     }
     return render(request, 'general_app/dashboard.html', context)
 
 
+@login_required
 def test(request):
-    if request.method == 'POST':
-        form = LetterForm(request.POST)
-        if form.is_valid():
-            print('test')
-    else:
-        form = LetterForm()
-    return render(request, 'general_app/test.html', {'form': form})
+    return render(request, 'general_app/test.html', )
+
+
+def fecth_report(obj):
+    data = {}
+    count = 0
+    users = obj
+    try:
+        for user in users:
+            user.id = user.hospital_id
+    except:
+        pass
+    for user in users:
+        if User_Detail.objects.get(user_id=user.id).is_upload:
+            upload = CertificateFile.objects.filter(hospital_id=user.id).order_by('-create_date')[0]
+            cert_id = upload.id
+            count_download = upload.count_download
+            upload = date_th(upload)[0]
+        else:
+            upload = ''
+            count_download = ''
+        data[count] = {'hospital': user, 'count_download': count_download,
+                       'upload_date': upload}
+        count += 1
+    return data

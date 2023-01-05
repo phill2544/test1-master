@@ -6,7 +6,7 @@ from django.contrib.auth.models import AbstractUser, User
 
 # Create your models here
 class CertificateFile(models.Model):
-    cert = models.FileField(upload_to='%Y/')
+    cert = models.FileField(upload_to='%Y/',max_length=200)
     hospital = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=False)
     create_date = models.DateField(auto_now_add=True, null=False)
     count_download = models.IntegerField(null=True, default=0)
@@ -52,6 +52,7 @@ class User_Detail(models.Model):
     send_email = models.BooleanField(null=True, blank=True)
     is_upload = models.BooleanField(default=0)  # check upload for ceating PDF
     number = models.CharField(max_length=10,null=True)
+    password = models.CharField(max_length=70, null=True)
 
     @property
     def email(self):

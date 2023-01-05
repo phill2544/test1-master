@@ -16,9 +16,12 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
     <script src="https://code.jquery.com/jquery-3.5.1.js"
             integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 
 </head>
 <body>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 {% if messages %}
     {% for message in messages %}
         <script>
@@ -33,7 +36,6 @@
         </script>
     {% endfor %}
 {% endif %}
-{{ user }}
 
 
 <div class="container-fluid h-100">
@@ -51,8 +53,8 @@
                 <p style="font-size: xxx-large">ศูนย์สนับสนุนบริการสุขภาพที่ 7</p>
             </div>
 
-            <div class="form-outline w-50 mt-5">
-                <form action="{% url 'login' %}" METHOD="post" >
+            <div class="form-outline w-50 mt-5 ">
+                <form action="{% url 'login' %}" METHOD="post">
                     <label class="form-label" for="username" style="font-size: 18px">ชื่อผู้ใช้งาน</label>
                     {% csrf_token %}
 
@@ -78,51 +80,53 @@
                     {#                                            <h1>{{ users }}</h1>#}
                     {#                                        {% endfor %}#}
 
-
-                    <input type="hidden" id="username" name="username">
-                    <select class="js-example-basic-single form-control" id="select2_login">
-                        {% comment %}               {% for users in uesr %}
-                                                    <option value="{{ users.id }}"> {{ users }} </option>
-                                                {% endfor %}{% endcomment %}
-                        {#                        <option value="">sa</option>#}
-                        {#                        <option value="">lll</option>#}
+                    <select class="js-example-basic-single " id="select2_login" name="username" style="width: 100%;" required>
+                    {% if request.session.user %}
+                        <option value="{{ request.session.user.username }}" selected> {{ request.session.user.username }} </option>
+                        {% else %}
+                        <option value="">--กรุณาเลือกชื่อผู้ใช้งาน--</option>
+                    {% endif %}
+                        {% for user in user %}
+                            <option value="{{ user }}"> {{ user }} </option>
+                        {% endfor %}
                     </select>
 
-                    {#{{ user }}#}
+
+                    {#                    {{ user }}#}
                     {##}
-                    {#                    <select name="hospital" class="form-control">#}
-                    {#                        {% for users in uesr %}#}
-                    {#                            <option value="{{ user }}"> {{ user }} </option>#}
-                    {#                        {% endfor %}#}
-                    {#                    </select>#}
-
-
-                    {#                    <select class="js-example-basic-multiple form-control form-control-lg" style="" name="states[]"#}
-                    {#                            multiple="multiple">#}
-                    {#                        {% for user in user %}#}
-                    {#                            <option value="{{ uesr }}">{{ user }}</option>#}
-                    {#                        {% endfor %}#}
-                    {#                    </select>#}
-
+                    {#                                        <select name="hospital" class="form-control">#}
+                    {#                                            {% for users in uesr %}#}
+                    {#                                                <option value="{{ user }}"> {{ user }} </option>#}
+                    {#                                            {% endfor %}#}
+                    {#                                        </select>#}
                     {##}
-                    {#                    <select class="js-example-basic-multiple form-control form-control-lg" style="" name="states[]"#}
-                    {#                            multiple="multiple">#}
-                    {#                        {% for user in user %}#}
-                    {#                            <option value="{{ uesr }}">{{ user }}</option>#}
-                    {#                        {% endfor %}#}
-                    {#                    </select>#}
+                    {##}
+                    {#                                        <select class="js-example-basic-multiple form-control form-control-lg" style="" name="states[]"#}
+                    {#                                                multiple="multiple">#}
+                    {#                                            {% for user in user %}#}
+                    {#                                                <option value="{{ uesr }}">{{ user }}</option>#}
+                    {#                                            {% endfor %}#}
+                    {#                                        </select>#}
+                    {##}
+                    {##}
+                    {#                                        <select class="js-example-basic-multiple form-control form-control-lg" style="" name="states[]"#}
+                    {#                                                multiple="multiple">#}
+                    {#                                            {% for user in user %}#}
+                    {#                                                <option value="{{ uesr }}">{{ user }}</option>#}
+                    {#                                            {% endfor %}#}
+                    {#                                        </select>#}
 
             </div>
 
             <!-- Password input -->
-            <div class="form-outline mb-6 w-50">
+            <div class="form-outline mb-3 w-50 my-3">
                 <label class="form-label" for="floatingPassword" style="font-size: 18px">รหัสผ่าน</label>
                 <input type="password" {% if messages %}#}
                     {% for message in messages %}
-                       class="form-control is-invalid"
+                       class="form-control  is-invalid"
                     {% endfor %}
                 {% else %}
-                       class="form-control"
+                       class="form-control "
                 {% endif %} id="floatingPassword"
                        placeholder="รหัสผ่าน"
                        name="password" required>
@@ -138,30 +142,46 @@
 </div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-
 <script>
+    {% comment %}    $('#myform').on('submit', function () {
 
-{% comment %}    $('#myform').on('submit', function () {
+
+            return true;
+        });{% endcomment %}
 
 
-        return true;
-    });{% endcomment %}
-    $(document).ready(function () {
-        $("#select2_login").append('{% for user in user %}'+'<option value="' + {{ user.id }} +'">'
-            + '{{ user }}'+ '</option>'+'{% endfor %}')
-        {#console.log('{{ user }}')#}
-        $("#submit_login").on('click', function () {
-            {#alert($("#select2_login").find("option:selected").text() + ' clicked!');#}
-            var selected = $("#select2_login").find("option:selected").text();
-            document.getElementById("username").value = selected;
+    {#document.getElementById("select2_login").classList.add('form-control form-control-lg');#}
+
+    {% comment %}
+        $(document).ready(function () {
+            $("#select2_login").append('{% for user in user %}'+'{% if request.session.user %}'+'<option value="'
+                + {{ request.session.user.user_id }} +'"selected>'+'{{ request.session.user.username }}'+'{% endif %}'
+                +'<option value="' + {{ user.id }} +'">'
+                + '{{ user }}'+ '</option>'+'{% endfor %}')
+            console.log('{{ user }}')
+            $("#submit_login").on('click', function () {
+                alert($("#select2_login").find("option:selected").text() + ' clicked!');
+                var selected = $("#select2_login").find("option:selected").text();
+                document.getElementById("username").value = selected;
+            });
+            $('.js-example-basic-single').select2();
+
         });
+    {% endcomment %}
+
+
+
+    {% comment %}            $(document).ready(function () {
+                    $('.js-example-basic-multiple').select2();
+                });{% endcomment %}
+
+    $(document).ready(function () {
         $('.js-example-basic-single').select2();
     });
-    {% comment %}        $(document).ready(function () {
-                $('.js-example-basic-multiple').select2();
-            });{% endcomment %}
+    $("#select2_login").select2({
+        placeholder: "Select a state",
+        allowClear: true
+    });
 </script>
 
 

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django_bootstrap_icons',
     'sweetify',
     "crispy_forms",
+    "bootstrap_daterangepicker"
 
 ]
 
