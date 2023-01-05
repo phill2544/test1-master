@@ -518,7 +518,10 @@ def profile(request):
 
 @login_required
 def configuration(request):
-    form_configuration = Configuration.objects.get(pk=1)
+    try:
+        form_configuration = Configuration.objects.get(pk=1)
+    except:
+        form_configuration = Configuration.objects.create(pk=1)
     province = Province.objects.all()
     ministry = Ministry.objects.all()
     state = None
