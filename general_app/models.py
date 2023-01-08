@@ -6,7 +6,7 @@ from django.contrib.auth.models import AbstractUser, User
 
 # Create your models here
 class CertificateFile(models.Model):
-    cert = models.FileField(upload_to='%Y/',max_length=200)
+    cert = models.FileField(upload_to='%Y/', max_length=200)
     hospital = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=False)
     create_date = models.DateField(auto_now_add=True, null=False)
     count_download = models.IntegerField(null=True, default=0)
@@ -19,6 +19,13 @@ class CertificateFile(models.Model):
         return self.hospital.user.username
 
 
+class Verify_Certificatefile(models.Model):
+    cert = models.FileField(upload_to='verify_certificate/', max_length=200)
+    hospital = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=False)
+    create_date = models.DateField(auto_now_add=True, null=False)
+    editing_message = models.TextField(null=True)
+
+
 class Configuration(models.Model):
     delete_date = models.IntegerField(default=3)
     send_mail_date = models.IntegerField(default=-2)
@@ -29,6 +36,7 @@ class Configuration(models.Model):
 
 class Province(models.Model):
     province = models.CharField(max_length=20, null=True, blank=True)
+    is_show = models.BooleanField(default=1, null=True)
 
     def __str__(self):
         return str(self.province)
@@ -36,6 +44,7 @@ class Province(models.Model):
 
 class Ministry(models.Model):
     ministry = models.CharField(max_length=60, null=True, blank=True)
+    is_show = models.BooleanField(default=1, null=True)
 
     def __str__(self):
         return str(self.ministry)
@@ -51,7 +60,7 @@ class User_Detail(models.Model):
     cal_date = models.DateField(null=True, blank=True)
     send_email = models.BooleanField(null=True, blank=True)
     is_upload = models.BooleanField(default=0)  # check upload for ceating PDF
-    number = models.CharField(max_length=10,null=True)
+    number = models.CharField(max_length=10, null=True)
     password = models.CharField(max_length=70, null=True)
 
     @property

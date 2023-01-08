@@ -66,10 +66,7 @@
                         <div class="m-3">
                             <label class="form-label">ตำแหน่ง</label>
                             <input name="position" class="form-control" type="text"
-                                   value="
-
-
-                                           {% if user_information.detail.position %}{{ user.detail.position }}{% endif %}">
+                                   value="{% if user_information.detail.position %}{{ user_information.detail.position }}{% endif %}">
                         </div>
 
                     </div>

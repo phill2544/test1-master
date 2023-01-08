@@ -39,24 +39,28 @@
             line-height: normal;
         }
 
-{% comment %}        span.select2-container {
-            z-index: 10050;
-        {
-        #}
+        {% comment %}        span.select2-container {
+                    z-index: 10050;
+                {
+                #}
 
-        .modal-open .select2-container {
-            z-index: 9999;
-        {
-        #}{% endcomment %}
+                .modal-open .select2-container {
+                    z-index: 9999;
+                {
+                #}{% endcomment %}
+
+        th{
+            font-size: 25px;
+        }
+
+        tr td{
+            font-size: 20px;
+        }
 
     </style>
 
 
     <link href="{% static 'bootstrap-datepicker-thai-thai/css/datepicker.css' %}" rel="stylesheet" media="screen">
-    {#        <link href="//getbootstrap.com/2.3.2/assets/js/google-code-prettify/prettify.css" rel="stylesheet">#}
-    {#    <link href="//getbootstrap.com/2.3.2/assets/css/bootstrap-responsive.css" rel="stylesheet">#}
-
-    {#date_range#}
     <link rel="stylesheet" type="text/css" href="{% static 'daterangepicker-master/daterangepicker.css' %}"/>
 
 
@@ -84,6 +88,11 @@
                     </li>
                     {% if request.user.is_superuser %}
                         <li class="nav-item active">
+                            <a class="nav-link " href="{% url 'upload_certificate' %}" style="font-size: 18px">
+                                {% bs_icon 'upload' size='23' %} <span class="sr-only" style="font-size: 18px">อัปโหลด</span>
+                            </a>
+                        </li>
+                        <li class="nav-item active">
                             <a class="nav-link " href="{% url 'dashboard' %}" style="font-size: 18px">
                                 {% bs_icon 'folder2-open' size='23' %} <span class="sr-only" style="font-size: 18px">รายงาน</span>
                             </a>
@@ -102,18 +111,18 @@
                 </ul>
 
                 <ul class="navbar-nav ms-auto">
-                        <li class="nav-item active">
-                            <a class="nav-link" href=" {% url 'profile' %}" style="font-size: 18px">
-                                {% bs_icon 'person-circle' size='23' %}
-                                </i> <span class="sr-only" style="font-size: 18px">{{ user.username }}</span><span
-                                    class="sr-only"></span></a>
-                        </li>
-                        <li class="nav-item active">
-                            <a class="nav-link" style="font-size: 18px"
-                               href="{% url 'logout' %}">{% bs_icon 'door-open' size='23' %} <span class="sr-only"
-                                                                                                   style="font-size: 18px">ออกจากระบบ</span><span
-                                    class="sr-only"></span></a>
-                        </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href=" {% url 'profile' %}" style="font-size: 18px">
+                            {% bs_icon 'person-circle' size='23' %}
+                            </i> <span class="sr-only" style="font-size: 18px">{{ user.username }}</span><span
+                                class="sr-only"></span></a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" style="font-size: 18px"
+                           href="{% url 'logout' %}">{% bs_icon 'door-open' size='23' %} <span class="sr-only"
+                                                                                               style="font-size: 18px">ออกจากระบบ</span><span
+                                class="sr-only"></span></a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -179,34 +188,9 @@
     $('.datepicker').datepicker({
         format: 'dd-mm-yyyy'
     });
+    $('.datepicker').datepicker('setStartDate', '{{ current_date }}');
 </script>
 
-{% comment %}<script type="text/javascript">
-    $(function () {
-        $('pre[data-source]').each(function () {
-            var $this = $(this),
-                $source = $($this.data('source'));
-
-            var text = [];
-            $source.each(function () {
-                var $s = $(this);
-                if ($s.attr('type') == 'text/javascript') {
-                    text.push($s.html().replace(/(\n)*/, ''));
-                } else {
-                    text.push($s.clone().wrap('<div>').parent().html()
-                        .replace(/(\"(?=[[{]))/g, '\'')
-                        .replace(/\]\"/g, ']\'').replace(/\}\"/g, '\'') // javascript not support lookbehind
-                        .replace(/\&quot\;/g, '"'));
-                }
-            });
-
-            $this.text(text.join('\n\n').replace(/\t/g, '    '));
-        });
-
-        prettyPrint();
-        demo();
-    });
-</script>{% endcomment %}
 
 
 </body>

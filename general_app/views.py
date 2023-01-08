@@ -16,9 +16,9 @@ from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
-from .models import User_Detail, CertificateFile, Configuration, Province, Ministry
+from .models import User_Detail, CertificateFile, Configuration, Province, Ministry, Verify_Certificatefile
 from django.contrib.auth.models import User
-from .forms import User_DetailForm, UserProfileForm, UserCreationForm, CertificateForm
+from .forms import User_DetailForm, UserProfileForm, UserCreationForm, CertificateForm, Verify_CertificateForm
 from django.conf import settings
 import os
 from django.core.mail import send_mail
@@ -290,7 +290,7 @@ def create_pdf(datas):
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=5,
                             leftMargin=5,
-                            topMargin=5,
+                            topMargin=10,
                             bottomMargin=5)
     #
     # pdf = SimpleDocTemplate(
@@ -309,10 +309,10 @@ def create_pdf(datas):
         # header,
         # ['', 'ศูนย์สนับสนุนบริการสุขภาพที่ 7', ''],
         ['อัปโหลดแล้ว', '{}/{}'.format(User_Detail.objects.filter(is_upload=True).count(), User.objects.all().count())],
-        ['ดาวโหลดแล้ว',
+        ['ดาวน์โหลดแล้ว',
          '{}/{}'.format(CertificateFile.objects.filter(count_download__gt=0).count(), User.objects.all().count())],
         ['', '', ''],
-        ['โรงพยาบาล', 'วันที่อัปโหลด', 'จำนวนการดาวโหลด'],
+        ['โรงพยาบาล', 'วันที่อัปโหลด', 'จำนวนการดาวน์โหลด'],
     ]
 
     # for user in User.objects.all():
@@ -372,10 +372,10 @@ def create_pdf(datas):
 
 @login_required
 def home(request, hospital_id=None):
-    try:
-        certform = CertificateForm(request.POST, request.FILES)
-    except:
-        certform = CertificateForm()
+    # try:
+    #     certform = CertificateForm(request.POST, request.FILES)
+    # except:
+    #     certform = CertificateForm()
     email_authen = None
     email_valid = None
     searched = None
@@ -416,11 +416,6 @@ def home(request, hospital_id=None):
                                        'name': name,
                                        'position': position,
                                        'number': number})
-        elif request.FILES:
-            if certform.is_valid():
-                User_Detail.objects.filter(user_id=certform.cleaned_data['hospital'].id).update(is_upload=True)
-                certform.save()
-            return HttpResponseRedirect(reverse('home'))
         elif 'delete_file' in request.POST:
             delete_files = str(request.POST)
             delete_files = delete_files[delete_files.index('delete_file') + 16:delete_files.index(']}>') - 5].split(',')
@@ -456,24 +451,24 @@ def home(request, hospital_id=None):
         #                    'date_filter': date_filters, 'users': users})
         cert_date = date_th(certs)
         return render(request, 'general_app/home.html',
-                      {'searched': searched, 'certs': zip(certs, cert_date), 'certform': certform, 'users': users})
+                      {'searched': searched, 'certs': zip(certs, cert_date), 'users': users})  # 'certform': certform,
     elif 'date_filter' in request.GET:
         date_filter = request.GET['date_filter'].split('-')
         result = CertificateFile.objects.filter(create_date__month=date_filter[1], create_date__year=date_filter[0])
         cert_date = date_th(result)
         return render(request, 'general_app/home.html',
-                      {'certs': zip(result, cert_date), 'certform': certform})
+                      {'certs': zip(result, cert_date)})  # , 'certform': certform
     elif hospital_id != None:
         if not request.user.is_superuser:
             print('hahaha test')
             count_download = CertificateFile.objects.get(pk=hospital_id).count_download + 1
             CertificateFile.objects.filter(pk=hospital_id).update(count_download=count_download)
             return HttpResponseRedirect(reverse('home'))
-        else :
+        else:
             return HttpResponseRedirect(reverse('home'))
     cert_date = date_th(certs)
     context = {'certs': zip(certs, cert_date), 'email_authen': email_authen, 'email_valid': email_valid,
-               'users': users, 'certform': certform, 'searched': searched}
+               'users': users, 'searched': searched}  # 'certform': certform,
     return render(request, 'general_app/home.html', context)
 
 
@@ -522,8 +517,6 @@ def configuration(request):
         form_configuration = Configuration.objects.get(pk=1)
     except:
         form_configuration = Configuration.objects.create(pk=1)
-    province = Province.objects.all()
-    ministry = Ministry.objects.all()
     state = None
     if request.method == "POST":
         if 'add_province' in request.POST:
@@ -533,10 +526,10 @@ def configuration(request):
             Ministry.objects.create(ministry=request.POST['add_ministry'])
             state = 'เพิ่มกระทรวง {} เสร็จสิ้น'.format(request.POST['add_ministry'])
         elif 'select_province' in request.POST:
-            Province.objects.filter(province=request.POST['select_province']).delete()
+            Province.objects.filter(province=request.POST['select_province']).update(is_show=False)
             state = 'ลบจังหวัด {} เสร็จสิ้น'.format(request.POST['select_province'])
         elif 'select_ministry' in request.POST:
-            Ministry.objects.filter(ministry=request.POST['select_ministry']).delete()
+            Ministry.objects.filter(ministry=request.POST['select_ministry']).update(is_show=False)
             state = 'ลบกระทรวง {} เสร็จสิ้น'.format(request.POST['select_ministry'])
         elif 'is_send' in request.POST:
             form_configuration.sender_mail_status = not form_configuration.sender_mail_status
@@ -553,6 +546,8 @@ def configuration(request):
             config.sender_mail = request.POST['sender_mail']
             config.save()
             state = 'เปลี่ยนการตั้งค่าเสร็จสิ้น'
+    province = Province.objects.filter(is_show=True)
+    ministry = Ministry.objects.filter(is_show=True)
     context = {'form_configuration': Configuration.objects.get(pk=1), 'province': province, 'ministry': ministry,
                'state': state}
     return render(request, 'general_app/configuration.html', context)
@@ -589,7 +584,9 @@ def manage_user(request):
                 form_user_detail = User_DetailForm()
                 form_user_creation = UserCreationForm()
                 context = {'add_user': True, 'users': users, 'form_user_creation': form_user_creation,
-                           'form_user_detail': form_user_detail, 'username': request.POST['username']}
+                           'form_user_detail': form_user_detail, 'username': request.POST['username'],
+                           'current_date': '{}-{}-{}'.format(datetime.date.today().day, datetime.date.today().month,
+                                                             int(datetime.date.today().year) + 543)}
                 return render(request, 'general_app/manage_users.html', context)
             else:
                 form_user_creation = form_user_creation
@@ -617,7 +614,7 @@ def edit_user(request, pk):
     try:
         name = User_Detail.objects.get(user_id=pk)
     except:
-        pass
+        name = User_Detail.objects.create(user_id=pk)
     if request.method == 'POST':
         form_user_detail = User_DetailForm(request.POST, instance=User_Detail.objects.get(user_id=name.user_id))
         user = User.objects.filter(id=pk)
@@ -636,11 +633,14 @@ def edit_user(request, pk):
         return HttpResponseRedirect(reverse('manage_user'))
         # return HttpResponseRedirect(reverse('manage_user'))
     try:
-        form_user_detail = User_DetailForm(instance=User_Detail.objects.get(user_id=pk))
-        form_user_detail.initial.update(cal_date=datetime.date(User_Detail.objects.get(user_id=pk).cal_date.year + 543,
-                                                               User_Detail.objects.get(user_id=pk).cal_date.month,
-                                                               User_Detail.objects.get(user_id=pk).cal_date.day))
-        form_user = UserProfileForm(instance=User.objects.get(id=pk))
+        user_detail_information = User_Detail.objects.get(user_id=pk)
+        form_user_detail = User_DetailForm(instance=user_detail_information)
+        form_user_detail.initial.update(cal_date=datetime.date(user_detail_information.cal_date.year + 543,
+                                                               user_detail_information.cal_date.month,
+                                                               user_detail_information.cal_date.day))
+        if name.province.is_show:  # show only province
+            form_user_detail.fields['province'].queryset = Province.objects.filter(is_show=True)
+        form_user = UserProfileForm(instance=user_detail_information)
         user_information = {
             'user': User.objects.get(id=pk),
             'detail': User_Detail.objects.get(user_id=pk)
@@ -679,10 +679,6 @@ def delete_user(request, name):
 @login_required
 def dashboard(request):
     data = {}
-    cert_id = []
-    count = 0
-    users = None
-    count_user = 0
     check_box = None
     try:
         search = request.GET.getlist('search_users')
@@ -770,3 +766,40 @@ def fecth_report(obj):
                        'upload_date': upload}
         count += 1
     return data
+
+
+def upload_certificate(request):
+    try:
+        verify_certificateform = Verify_CertificateForm(request.POST, request.FILES)
+    except:
+        verify_certificateform = Verify_CertificateForm()
+    if request.method == "POST":
+        if request.FILES:
+            verify_certificateform.fields['editing_message'].required = False
+            if verify_certificateform.is_valid():
+                verify_certificateform.save()
+            return HttpResponseRedirect(reverse('upload_certificate'))
+        elif 'cert_id' in request.POST:
+            Verify_Certificatefile.objects.filter(pk=request.POST['cert_id']).update(editing_message=request.POST['editing_message'])
+            return HttpResponseRedirect(reverse('upload_certificate'))
+        elif 'delete_cert_id' in request.POST:
+            Verify_Certificatefile.objects.get(pk=request.POST['delete_cert_id']).delete()
+            return HttpResponseRedirect(reverse('upload_certificate'))
+    verify_certificate_editing = Verify_Certificatefile.objects.filter(editing_message__isnull=False).exclude(
+        editing_message__exact='')
+    verify_certificate_confirm = Verify_Certificatefile.objects.filter(editing_message='')
+    for index, file in enumerate(verify_certificate_editing):
+        verify_certificate_editing[index].create_date = date_th(file)
+    for index, file in enumerate(verify_certificate_confirm):
+        verify_certificate_confirm[index].create_date = date_th(file)
+    context = {
+        'verify_certificateform': verify_certificateform,
+        'verify_certificate_editing': verify_certificate_editing,
+        'verify_certificate_confirm': verify_certificate_confirm
+
+    }
+    return render(request, 'general_app/upload_certificate.html', context)
+
+# def upload_certificate_id(request,cert_id):
+#     print(cert_id)
+#     return HttpResponseRedirect(reverse('upload_certificate'))

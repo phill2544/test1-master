@@ -3,16 +3,15 @@
 {% block content %}
     {% load static %}
     {% load bootstrap_icons %}
-    {% csrf_token %}
-    <div class="dropup position-fixed bottom-0 end-0 rounded-circle mb-3 me-3" id="delete_btn" style="display: none">
-        <form action="{% url 'home' %}" method="POST">
-            {% csrf_token %}
-            <input style="display: none" id="delete_file_input" name="delete_file" value="">
-            <button type="submit" class="btn btn-danger btn-lg" name="delete_file" onclick="delete_btn()">
-                {% bs_icon 'trash' size='23' %}ลบไฟล์
-            </button>
-        </form>
-    </div>
+{#    <div class="dropup position-fixed bottom-0 end-0 rounded-circle mb-3 me-3" id="delete_btn" style="display: none">#}
+{#        <form action="{% url 'home' %}" method="POST">#}
+{#            {% csrf_token %}#}
+{#            <input style="display: none" id="delete_file_input" name="delete_file" value="">#}
+{#            <button type="submit" class="btn btn-danger btn-lg" name="delete_file" onclick="delete_btn()">#}
+{#                {% bs_icon 'trash' size='23' %}ลบไฟล์#}
+{#            </button>#}
+{#        </form>#}
+{#    </div>#}
     <style>
         .select2-container .select2-selection--single {
             width: 200px;
@@ -131,7 +130,7 @@
 
 
     {% endfor %}
-    {{ request.session.user }}
+{#    {{ request.session.user }}#}
     {#search#}
     {% if request.user.is_superuser %}
         <form action="{% url 'home' %}" method="get">
@@ -154,9 +153,9 @@
                     {% bs_icon 'search' %}
                 </button>
 
-                <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#add_cert">
+{% comment %}                <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#add_cert">
                     {% bs_icon 'plus-circle' size='23' %}
-                </button>
+                </button>{% endcomment %}
 
             </div>
         </form>
@@ -167,7 +166,7 @@
         <div class="p-2 flex-grow-2 bd-highlight w-75 table-responsive">
             <table class="table table-lg table-hover">
                 <thead>
-                <tr style="font-size: 20px">
+                <tr>
                     <th scope="col">ลำดับที่</th>
                     {% if request.user.is_superuser %}
                         <th scope="col">โรงพยาบาล</th>
@@ -185,12 +184,11 @@
                         <tr>
                             <th scope="row">{{ forloop.counter }}</th>
                             {% if request.user.is_superuser %}
-                                <td style="font-size: 18px">{{ cert.hospital }}
-                                </td>
+                                <td>{{ cert.hospital }}</td>
                             {% endif %}
                             <td><a href="{{ cert.cert.url }}"
                                    onclick="window.location.replace('{% url 'home' cert.id %}');"
-                                   target="_blank">ดาวโหลดไฟล์คลิกที่นี้</a></td>
+                                   target="_blank">ดาวโหลดไฟล์คลิกที่นี่</a></td>
 
                             {#                                    <td>{{ cert.create_date|date:"D d M Y" }}</td>#}
                             <td>{{ cert_date }}</td>
@@ -300,7 +298,7 @@
 
 
     {#    add_cert #}
-    <div class="modal fade" id="add_cert" aria-labelledby="exampleModalLabel" tabindex="-1" aria-hidden="true">
+  {% comment %}  <div class="modal fade" id="add_cert" aria-labelledby="exampleModalLabel" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -336,45 +334,45 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>{% endcomment %}
 
 
 
 
 
 
-
-    <script>
-
-        document.getElementById("div_upload").style.display = "none"
-        document.getElementById("div_upload_btn").style.display = "none"
-        console.log('select2');
-        $('#mySelect2').select2({
-            dropdownParent: $('#add_cert')
-        });
-
-        $('#upload_input').change(function () {
-            if (document.getElementById("upload_input").files.length == 0) {
-                document.getElementById("div_upload_btn").style.display = "none"
-            } else {
-                console.log('else')
-                document.getElementById("div_upload_btn").style.display = "block"
-            }
-        })
-
-        $('#mySelect2').change(function () {
-            var val = $("#mySelect2 option:selected").text();
-            if (val != '---------') {
-                console.log('val if', val);
-                document.getElementById("div_upload").style.display = "block"
-
-            } else {
-                console.log('val else', val);
-                document.getElementById("div_upload").style.display = "none"
-                document.getElementById("div_upload_btn").style.display = "none"
-            }
-        });
-    </script>
+{#hide div#}
+{#    <script>#}
+{##}
+{#        document.getElementById("div_upload").style.display = "none"#}
+{#        document.getElementById("div_upload_btn").style.display = "none"#}
+{#        console.log('select2');#}
+{#        $('#mySelect2').select2({#}
+{#            dropdownParent: $('#add_cert')#}
+{#        });#}
+{##}
+{#        $('#upload_input').change(function () {#}
+{#            if (document.getElementById("upload_input").files.length == 0) {#}
+{#                document.getElementById("div_upload_btn").style.display = "none"#}
+{#            } else {#}
+{#                console.log('else')#}
+{#                document.getElementById("div_upload_btn").style.display = "block"#}
+{#            }#}
+{#        })#}
+{##}
+{#        $('#mySelect2').change(function () {#}
+{#            var val = $("#mySelect2 option:selected").text();#}
+{#            if (val != '---------') {#}
+{#                console.log('val if', val);#}
+{#                document.getElementById("div_upload").style.display = "block"#}
+{##}
+{#            } else {#}
+{#                console.log('val else', val);#}
+{#                document.getElementById("div_upload").style.display = "none"#}
+{#                document.getElementById("div_upload_btn").style.display = "none"#}
+{#            }#}
+{#        });#}
+{#    </script>#}
 
 
 
