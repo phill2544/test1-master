@@ -1,5 +1,5 @@
 from django import forms
-from .models import User_Detail, CertificateFile ,Verify_Certificatefile
+from .models import User_Detail, CertificateFile, Verify_Certificatefile
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Province
@@ -11,12 +11,13 @@ class User_DetailForm(forms.ModelForm):
         fields = ('address', 'province', 'ministry', 'code', 'cal_date', 'password')
         widgets = {
             'address': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'ที่อยู่', 'rows': '1'}),
-            'province': forms.Select(attrs={'class': 'form-control', 'placeholder': '','required': 'true'}),
+            'province': forms.Select(attrs={'class': 'form-control', 'placeholder': '', 'required': 'true'}),
             'ministry': forms.Select(attrs={'class': 'form-control', 'placeholder': ''}),
             'code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '1234567'}),
             'password': forms.TextInput(attrs={'class': 'form-control', 'disabled': 'true'}),
             'cal_date': forms.DateInput(format=('%d-%m-%Y'),
-                                        attrs={'class': 'datepicker input-medium form-control', 'placeholder': 'เลือกวันที่',
+                                        attrs={'class': 'datepicker input-medium form-control',
+                                               'placeholder': 'เลือกวันที่',
                                                'type': 'text',
                                                'onfocus': 'this.showPicker()', 'required': 'true',
                                                'data-provide': "datepicker", 'data-date-language': "th-th",
@@ -59,7 +60,8 @@ class CertificateForm(forms.ModelForm):
         model = CertificateFile
         fields = ('cert', 'hospital')
         widgets = {
-            'cert': forms.FileInput(attrs={'class': 'form-control form-control-lg', 'id': 'upload_input','required': 'true'}),
+            'cert': forms.FileInput(
+                attrs={'class': 'form-control form-control-lg', 'id': 'upload_input', 'required': 'true'}),
             # 'hospital': forms.Select(attrs={'class': 'form-control form-control-lg', 'list': 'datalistOptions',
             #                                 'placeholder': "ชื่อโรงพยาบาล", 'type': 'text', 'id': 'datalist_input'})  ,
             'hospital': forms.Select(attrs={
@@ -71,12 +73,13 @@ class CertificateForm(forms.ModelForm):
 class Verify_CertificateForm(forms.ModelForm):
     class Meta:
         model = Verify_Certificatefile
-        fields =  ('cert', 'hospital','editing_message')
+        fields = ('cert', 'hospital', 'editing_message', 'user_create')
         widgets = {
             'cert': forms.FileInput(
                 attrs={'class': 'form-control form-control-lg', 'required': 'true'}),
             'hospital': forms.Select(attrs={
                 'class': "js-example-basic-single form-control form-control-lg",
-                'name': "state", 'id': 'mySelect2','required':'true'}),
-            'editing_message' : forms.TextInput(attrs={'class':'form-control form-control-lg'})
+                'name': "state", 'id': 'mySelect2', 'required': 'true'}),
+            'editing_message': forms.TextInput(attrs={'class': 'form-control form-control-lg'}),
+            'user_create': forms.TextInput(attrs={'class': 'form-control'})
         }

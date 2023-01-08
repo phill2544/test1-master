@@ -402,8 +402,16 @@ def home(request, hospital_id=None):
                 User_Detail.objects.filter(user_id=request.user.id).update(position=position, number=number)
                 name_split = str(name).split()
                 user.email = email_authen
-                user.first_name = name_split[0]
-                user.last_name = name_split[1]
+                # if name_split.__len__() >= 3 :
+                #     for count in name_split:
+                #         name_split[0] += name_split[count]
+                #         if count == name_split.__len__() - 2:
+                #             break
+                try:
+                    user.first_name = name_split[0]
+                    user.last_name = name_split[1]
+                except:
+                    user.first_name = name_split[0]
                 # user_detail[0].position = position
                 # user_detail[0].number = number
                 # user_detail[0].save()
@@ -460,7 +468,6 @@ def home(request, hospital_id=None):
                       {'certs': zip(result, cert_date)})  # , 'certform': certform
     elif hospital_id != None:
         if not request.user.is_superuser:
-            print('hahaha test')
             count_download = CertificateFile.objects.get(pk=hospital_id).count_download + 1
             CertificateFile.objects.filter(pk=hospital_id).update(count_download=count_download)
             return HttpResponseRedirect(reverse('home'))
@@ -520,9 +527,16 @@ def configuration(request):
     state = None
     if request.method == "POST":
         if 'add_province' in request.POST:
-            Province.objects.create(province=request.POST['add_province'])
+            try:
+                Province.objects.filter(province=request.POST['add_province']).update(is_show=1)
+            except:
+                Province.objects.create(province=request.POST['add_province'])
             state = 'เพิ่มจังหวัด {} เสร็จสิ้น'.format(request.POST['add_province'])
         elif 'add_ministry' in request.POST:
+            try:
+                Ministry.objects.filter(province=request.POST['add_ministry']).update(is_show=1)
+            except:
+                Ministry.objects.create(province=request.POST['add_ministry'])
             Ministry.objects.create(ministry=request.POST['add_ministry'])
             state = 'เพิ่มกระทรวง {} เสร็จสิ้น'.format(request.POST['add_ministry'])
         elif 'select_province' in request.POST:
@@ -602,6 +616,7 @@ def manage_user(request):
                        'form_user_detail': form_user_detail, 'users': users}
             return render(request, 'general_app/manage_users.html', context)
     form_user_detail = User_DetailForm()
+    form_user_detail.fields['province'].queryset = Province.objects.filter(is_show=True)
     form_user_creation = UserCreationForm()
     context = {'users': users, 'form_user_detail': form_user_detail, 'form_user_creation': form_user_creation}
     return render(request, 'general_app/manage_users.html', context)
@@ -775,15 +790,22 @@ def upload_certificate(request):
         verify_certificateform = Verify_CertificateForm()
     if request.method == "POST":
         if request.FILES:
-            verify_certificateform.fields['editing_message'].required = False
             if verify_certificateform.is_valid():
-                verify_certificateform.save()
+                obj = verify_certificateform.save(commit=False)
+                obj.user_create = request.user
+                obj.save()
             return HttpResponseRedirect(reverse('upload_certificate'))
         elif 'cert_id' in request.POST:
-            Verify_Certificatefile.objects.filter(pk=request.POST['cert_id']).update(editing_message=request.POST['editing_message'])
+            Verify_Certificatefile.objects.filter(pk=request.POST['cert_id']).update(editing_message=request.POST['editing_message'],user_create=request.user.username)
             return HttpResponseRedirect(reverse('upload_certificate'))
-        elif 'delete_cert_id' in request.POST:
+        elif 'delete_cert' in request.POST and request.POST['delete_cert'] != '':
             Verify_Certificatefile.objects.get(pk=request.POST['delete_cert_id']).delete()
+            return HttpResponseRedirect(reverse('upload_certificate'))
+        elif 'confirm_cert' in request.POST and request.POST['confirm_cert']:
+            # Verify_Certificatefile.objects.get(pk=request.POST['delete_cert_id']).delete()
+            certifi_form = CertificateForm(request.POST, request.FILES)
+            if certifi_form.is_valid():
+                certifi_form.save()
             return HttpResponseRedirect(reverse('upload_certificate'))
     verify_certificate_editing = Verify_Certificatefile.objects.filter(editing_message__isnull=False).exclude(
         editing_message__exact='')
@@ -795,11 +817,8 @@ def upload_certificate(request):
     context = {
         'verify_certificateform': verify_certificateform,
         'verify_certificate_editing': verify_certificate_editing,
-        'verify_certificate_confirm': verify_certificate_confirm
+        'verify_certificate_confirm': verify_certificate_confirm,
 
     }
     return render(request, 'general_app/upload_certificate.html', context)
 
-# def upload_certificate_id(request,cert_id):
-#     print(cert_id)
-#     return HttpResponseRedirect(reverse('upload_certificate'))

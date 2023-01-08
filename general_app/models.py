@@ -23,7 +23,9 @@ class Verify_Certificatefile(models.Model):
     cert = models.FileField(upload_to='verify_certificate/', max_length=200)
     hospital = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=False)
     create_date = models.DateField(auto_now_add=True, null=False)
-    editing_message = models.TextField(null=True)
+    editing_message = models.TextField(null=True, blank=True)
+    user_create = models.CharField(max_length=200,null=True,blank=True)
+
 
 
 class Configuration(models.Model):

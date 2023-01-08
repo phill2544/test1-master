@@ -228,24 +228,24 @@
                         </div>
                         <div class="modal-body">
                             <div class="container">
-                                <label>ตำแหน่ง</label>
+                                <label>ตำแหน่ง <span style="color: red">*</span></label>
                                 <input type="text" class="form-control mb-3"
                                        placeholder="ตำแหน่ง" name="position" required
                                        {% if email_authen %}value="{{ position }} {% endif %}">
-                                <label>ชื่อ-นามสกุล</label>
+                                <label>ชื่อ-นามสกุล <span style="color: red">*</span></label>
                                 <input type="text" class="form-control mb-3"
                                        placeholder="ชื่อ-สกุล" name="name" required
                                        {% if email_authen %}value="{{ name }} {% endif %}">
-                                <label>เบอร์โทร</label>
-                                <input type="text" class="form-control mb-3"
+                                <label>เบอร์โทร <span style="color: red">*</span></label>
+                                <input type="text" class="form-control mb-3" minlength="6" maxlength="10" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
                                        placeholder="เบอร์โทรที่สามารถติดต่อได้" name="number" required
                                        {% if email_authen %}value="{{ number }} {% endif %}">
-                                <label>อีเมล</label>
+                                <label>อีเมล <span style="color: red">*</span></label>
                                 <input type="email" class="form-control mb-3" id="exampleInputEmail1"
                                        aria-describedby="emailHelp"
                                        placeholder="กรอกอีเมล" name="email" required
                                        {% if email_authen %}value="{{ email_authen }} {% endif %}">
-                                <label>ยืนยันอีเมล</label>
+                                <label>ยืนยันอีเมล <span style="color: red">*</span></label>
                                 <input type="email" name="email_valid" placeholder="กรอกอีเมลอีกครั้ง"
                                        class="form-control"
                                        autocomplete="off">

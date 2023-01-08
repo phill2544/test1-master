@@ -19,7 +19,7 @@
                 {{ verify_certificateform.cert }}
             </div>
             <div class="p-2" {% comment %}id="div_upload_btn"{% endcomment %} {% comment %}class="p-2"{% endcomment %}>
-                <button type="submit" class="btn btn-outline-success btn-lg" name="submit_upload"
+                <button type="submit" class="btn btn-outline-success btn-lg" name="submit_upload" onclick="test()"
                         {% comment %} id="submit_file"{% endcomment %}>อัปโหลด
                 </button>
             </div>
@@ -34,6 +34,7 @@
                 <tr>
                     <th scope="col" style="width: 15%">ลำดับที่</th>
                     <th scope="col" style="width: 27%">โรงพยาบาล</th>
+                    <th scope="col" style="width: 27%">อัปโหลดโดย</th>
                     <th scope="col" style="width: 25%">ไฟล์</th>
                     <th scope="col">วันที่</th>
                     <th></th>
@@ -46,6 +47,7 @@
                     <tr>
                         <th scope="row">{{ forloop.counter }}</th>
                         <td>{{ cert.hospital }}</td>
+                        <td>{{ cert.user_create }}</td>
                         <td><a href="{{ cert.cert.url }}">คลิกดูตัวอย่างที่นี่</a></td>
                         <td>{{ cert.create_date.0 }}</td>
                         <td>
@@ -56,10 +58,12 @@
                         {#                            <td><button type="button" class="btn btn-outline-success" onclick="editing('{{ cert.id }}')">{% bs_icon 'check-circle-fill' size='23' %}</button></td>#}
                         <td>
                             <button type="button"
-                                    class="btn btn-warning">{% bs_icon 'check-circle-fill' size='23' %}</button>
+                                    class="btn btn-warning"
+                                    onclick="confirm_cert_btn('{{ cert.id }}','{{ cert.cert.url }}','{{ cert.hospital }}')">{% bs_icon 'check-circle-fill' size='23' %}</button>
                         </td>
                         <td>
-                            <button type="button" class="btn btn-danger">{% bs_icon 'trash' size='23' %}</button>
+                            <button type="button" class="btn btn-danger"
+                                    onclick="delete_cert_btn({{ cert.id }})">{% bs_icon 'trash' size='23' %}</button>
                         </td>
                     </tr>
                 {% endfor %}
@@ -67,31 +71,19 @@
             </table>
         </div>
     </div>
-    {#    <div class="d-flex justify-content-center flex-wrap mt-3">#}
-    {#        <div class="p-2 flex-grow-2 bd-highlight w-75 table-responsive">#}
-    {#            <table class="table table-lg table-hover caption-top">#}
-    {#                <h3 style="align-items: center">รอการยืนยัน</h3>#}
-    {#                <thead style="background-color: wheat">#}
-    {#                <tr>#}
-    {#                    <th scope="col">ลำดับที่</th>#}
-    {#                    <th scope="col">โรงพยาบาล</th>#}
-    {#                    <th scope="col">ไฟล์</th>#}
-    {#                    <th scope="col">วันที่</th>#}
-    {#                </tr>#}
-    {#                </thead>#}
-    {#                <tbody>#}
-    {#                <tr>#}
-    {#                    {% for cert in verify_certificate_confirm %}#}
-    {#                        <th scope="row">{{ forloop.counter }}</th>#}
-    {#                        <td>{{ cert.hospital }}</td>#}
-    {#                        <td><a href="{{ cert.cert.url }}">คลิกดูตัวอย่างที่นี่</a></td>#}
-    {#                        <td>{{ cert.create_date.0 }}</td>#}
-    {#                    {% endfor %}#}
-    {#                </tr>#}
-    {#                </tbody>#}
-    {#            </table>#}
-    {#        </div>#}
-    {#    </div>#}
+
+
+
+  <form action="{% url 'upload_certificate'%}" method="post" enctype="multipart/form-data" id="confirm_file">
+  {% csrf_token %}
+        <input type="hidden" id="confirm_cert" name="confirm_cert">
+      <div hidden>
+          <input type="file" id="cert" name="cert">
+      </div>
+        <input type="hidden" id="hospital_id" name="hospital_id">
+</form>
+
+
 
     <form action="{% url 'upload_certificate' %}" method="post" id="editing_form">
         {% csrf_token %}
@@ -103,6 +95,7 @@
                     <tr>
                         <th scope="col" style="width: 15%">ลำดับที่</th>
                         <th scope="col" style="width: 27%">โรงพยาบาล</th>
+                        <th scope="col" style="width: 27%">เพิ่มการแกไข้โดย</th>
                         <th scope="col" style="width: 25%">ไฟล์</th>
                         <th scope="col">วันที่</th>
                         <th></th>
@@ -113,22 +106,23 @@
                         <tr>
                             <th scope="row">{{ forloop.counter }}</th>
                             <td>{{ cert.hospital }}</td>
+                            <td>{{ cert.user_create }}</td>
                             <td><a href="{{ cert.cert.url }}">คลิกดูตัวอย่างที่นี่</a></td>
                             <td>{{ cert.create_date.0 }}</td>
                             <td>
-                                <button type="button" class="btn btn-danger" onclick="delete_cert_btn({{ cert.id }})">{% bs_icon 'trash' size='23' %}</button>
+                                <button type="button" class="btn btn-danger"
+                                        onclick="delete_cert_btn({{ cert.id }})">{% bs_icon 'trash' size='23' %}</button>
                             </td>
                         </tr>
                     {% endfor %}
-                    <input type="hidden" id="delete_cert_id" name="delete_cert_id">
                     </tbody>
                 </table>
             </div>
         </div>
+        <input type="hidden" id="delete_cert" name="delete_cert">
     </form>
 
 
-    <!-- Button trigger modal -->
 
 
     <!-- Modal editing -->
@@ -162,8 +156,8 @@
     </form>
 
 
-
-
+<input type="file" id="file" accept=".jpg, .png, .jpeg">
+<button id="buttonFile">Upload file</button>
 
     <script>
 
@@ -177,44 +171,91 @@
                 }{% endcomment %}
 
 
-{% comment %}        $('#delete_cert_btn').on('click', function (e) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire(
-                        'Deleted!',
-                        'Your file has been deleted.',
-                        'success'
-                    )
-                }
-            })
-        });{% endcomment %}
+        {% comment %}        $('#delete_cert_btn').on('click', function (e) {
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "You won't be able to revert this!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, delete it!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire(
+                                'Deleted!',
+                                'Your file has been deleted.',
+                                'success'
+                            )
+                        }
+                    })
+                });{% endcomment %}
 
         function delete_cert_btn(id) {
             console.log(id)
             Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
+                title: 'คุณต้องการจะลบเอกสารหรือไม่',
+                {% comment %}                text: "You won't be able to revert this!",{% endcomment %}
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonColor: '#198754',
+                cancelButtonColor: '#BB2D3B',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonText: 'ยืนยัน'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    document.getElementById('delete_cert_id').value = id
+                    document.getElementById('delete_cert').value = id
                     document.getElementById("editing_form").submit();
                 }
             })
         }
 
+        function confirm_cert_btn(id,file,hospital) {
+            console.log(id)
+            console.log(file)
+            console.log(hospital)
+            Swal.fire({
+                title: 'ยืนยันการอนุมัติ',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#198754',
+                cancelButtonColor: '#BB2D3B',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonText: 'ยืนยัน'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    console.log('if')
+                    document.getElementById('confirm_cert').value = id
+                    console.log('if1')
+                    document.getElementById('cert').value = file
+                    console.log('if2')
+                    document.getElementById('hospital_id').value = hospital
+                    console.log('if3')
+                    document.getElementById("confirm_file").submit();
+                }
+            })
+        }
+{% comment %}function test() {
+    var a =document.getElementById('upload_input');
+    console.log(a.value);
+}{% endcomment %}
+
+        window.onload = function() {
+  var buttonFile = document.getElementById("buttonFile");
+  var file = document.getElementById("file");
+
+  buttonFile.onclick = function() {
+    document.getElementById("file").click();
+  };
+
+  file.onchange = function(e){
+      console.log(this.files)
+      console.log(this.files[0])
+     if (this.files && this.files[0]) {
+        alert(JSON.stringify(this.files[0]));
+     }
+  };
+};
 
     </script>
 {% endblock %}

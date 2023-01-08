@@ -2,7 +2,7 @@
 {% block title %}Profile{% endblock %}
 {% block content %}
 
-    <form action="{% url 'profile' %} " method="post">
+    <form action="{% url 'profile' %} " method="post" >
         {{ form_user.non_field_errors }}
         {{ form_auth.non_field_errors }}
         {% csrf_token %}
